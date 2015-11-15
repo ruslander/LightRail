@@ -10,6 +10,8 @@ namespace LightRail
             Degree = degree;
             Height = 1;
             Root = new BNode(degree);
+
+            //DiskWrite(Root);
         }
 
         public BNode Root { get; private set; }
@@ -50,22 +52,26 @@ namespace LightRail
             return node.IsLeaf ? null : SearchInternal(node.Children[i], key);
         }
 
-        private void SplitChild(BNode parentNode, int nodeToBeSplitIndex, BNode nodeToBeSplit)
+        private void SplitChild(BNode internalNode, int fullNodeIndex, BNode fullNode)
         {
             var newNode = new BNode(Degree);
 
-            parentNode.Keys.Insert(nodeToBeSplitIndex, nodeToBeSplit.Keys[Degree - 1]);
-            parentNode.Children.Insert(nodeToBeSplitIndex + 1, newNode);
+            internalNode.Keys.Insert(fullNodeIndex, fullNode.Keys[Degree - 1]);
+            internalNode.Children.Insert(fullNodeIndex + 1, newNode);
 
-            newNode.Keys.AddRange(nodeToBeSplit.Keys.GetRange(Degree, Degree - 1));
+            newNode.Keys.AddRange(fullNode.Keys.GetRange(Degree, Degree - 1));
 
-            nodeToBeSplit.Keys.RemoveRange(Degree - 1, Degree);
+            fullNode.Keys.RemoveRange(Degree - 1, Degree);
 
-            if (!nodeToBeSplit.IsLeaf)
+            if (!fullNode.IsLeaf)
             {
-                newNode.Children.AddRange(nodeToBeSplit.Children.GetRange(Degree, Degree));
-                nodeToBeSplit.Children.RemoveRange(Degree, Degree);
+                newNode.Children.AddRange(fullNode.Children.GetRange(Degree, Degree));
+                fullNode.Children.RemoveRange(Degree, Degree);
             }
+
+            //DiskWrite(fullNode);
+            //DiskWrite(newNode);
+            //DiskWrite(internalNode);
         }
 
         private void InsertNonFull(BNode node, int k)
@@ -75,6 +81,7 @@ namespace LightRail
             if (node.IsLeaf)
             {
                 node.Keys.Insert(positionToInsert, k);
+                //DiskWrite(node);
                 return;
             }
 
