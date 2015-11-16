@@ -11,10 +11,46 @@ namespace LightRail
     public class OpLogSpec
     {
         [Test]
-        public void OpWrite()
+        public void MultiOpWriteRead()
         {
             var storage = new MemoryStream();
 
+            var quotes = new string[]
+            {
+                "Frugality without creativity is deprivation.",
+                "Use, do not abuse; neither abstinence nor excess ever renders man happy.",
+                "Prosperity is only an instrument to be used, not a deity to be worshipped.",
+                "It's very important that we start creating new content again. We can only build on nostalgia so much before we have nothing left to build on.",
+            };
+
+            var writer = new BinaryWriter(storage);
+            foreach (var quote in quotes)
+            {
+                var msgStream = ToStream(quote);
+                var op = new Op(msgStream.GetBuffer());
+
+                op.WriteTo(writer);
+
+                Console.WriteLine("w" + storage.Position);
+            }
+
+            storage.Position = 0;
+
+            var reader = new BinaryReader(storage);
+            foreach (var quote in quotes)
+            {
+                var result = Op.ReadFrom(reader);
+                var org2 = FromStream(new MemoryStream(result.Payload));
+
+                Console.WriteLine("r" + storage.Position);
+                Assert.That(quote, Is.EqualTo(org2));
+            }
+        }
+
+        [Test]
+        public void SingleOpWriteRead()
+        {
+            var storage = new MemoryStream();
 
             const string msg = "this is the hello world";
             var msgStream = ToStream(msg);
@@ -65,6 +101,7 @@ namespace LightRail
         public byte[] Payload { get; private set; }
         public byte[] Hash { get; private set; }
         public long Length { get; private set; }
+        public long Position { get; private set; }
 
         public Op(byte[] payload)
         {
@@ -82,10 +119,6 @@ namespace LightRail
 
         public void WriteTo(BinaryWriter writer)
         {
-            Console.WriteLine("Hash : " + Hash.Length);
-            Console.WriteLine("Payload : " + Payload.Length);
-            Console.WriteLine("Length : " + Length);
-
             writer.Write(Length);
             writer.Write((byte)0);
             writer.Write(Hash);
@@ -101,13 +134,8 @@ namespace LightRail
             var payloadLength = length - hash.Length - 1;
             var payload = reader.ReadBytes((int)payloadLength);
 
-            Console.WriteLine("Hash :" + hash.Length);
-            Console.WriteLine("Payload : " + payload.Length);
-            Console.WriteLine("Length : " + length);
-
             return new Op(payload, hash, length);
         }
-
 
         public static byte[] GetHashFor(byte[] payload)
         {
