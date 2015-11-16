@@ -16,6 +16,10 @@ namespace LightRail
             var msg = "this is the hello world";
 
             var output = Pack(msg);
+
+            Console.WriteLine("Packed :" + output.Length);
+
+
             var result = Unpack(output);
 
             Console.WriteLine(result);
@@ -26,13 +30,16 @@ namespace LightRail
             using (var memStream = new MemoryStream(output))
             using (var reader = new BinaryReader(memStream))
             {
-                var length = reader.ReadInt32();
+                var length = reader.ReadInt64();
                 var delivered = reader.ReadByte();
                 var hash = reader.ReadBytes(16);
 
+                Console.WriteLine("Position : " + memStream.Position);
+
+
                 var payloadLength = length - hash.Length - 1;
 
-                var payload = reader.ReadBytes(payloadLength);
+                var payload = reader.ReadBytes((int)payloadLength);
 
                 Console.WriteLine("Hash :" + hash.Length);
                 Console.WriteLine("Payload : " + payload.Length);
@@ -48,11 +55,11 @@ namespace LightRail
             {
                 var payload = ToStream(msg);
                 var hash = GetHashFor(payload);
+                var length = 1 + payload.Length + hash.Length;
 
                 Console.WriteLine("Hash :" + hash.Length);
                 Console.WriteLine("Payload : " + payload.Length);
-
-                var length = 1 + payload.Length + hash.Length;
+                Console.WriteLine("Calc length :" + length);
 
                 writer.Write(length);
 
