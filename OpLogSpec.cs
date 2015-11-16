@@ -13,65 +13,23 @@ namespace LightRail
         [Test]
         public void OpWrite()
         {
-            var msg = "this is the hello world";
-
-            var output = Pack(msg);
-
-            Console.WriteLine("Packed :" + output.Length);
+            var storage = new MemoryStream();
 
 
-            var result = Unpack(output);
+            const string msg = "this is the hello world";
+            var msgStream = ToStream(msg);
+            var op = new Op(msgStream.GetBuffer());
 
-            Console.WriteLine(result);
-        }
+            var writer = new BinaryWriter(storage);
+            op.WriteTo(writer);
 
-        private object Unpack(byte[] output)
-        {
-            using (var memStream = new MemoryStream(output))
-            using (var reader = new BinaryReader(memStream))
-            {
-                var length = reader.ReadInt64();
-                var delivered = reader.ReadByte();
-                var hash = reader.ReadBytes(16);
+            storage.Position = 0;
+            var reader = new BinaryReader(storage);
+            var result = Op.ReadFrom(reader);
 
-                Console.WriteLine("Position : " + memStream.Position);
+            var org2 = FromStream(new MemoryStream(result.Payload));
 
-
-                var payloadLength = length - hash.Length - 1;
-
-                var payload = reader.ReadBytes((int)payloadLength);
-
-                Console.WriteLine("Hash :" + hash.Length);
-                Console.WriteLine("Payload : " + payload.Length);
-
-                return FromStream(new MemoryStream(payload));
-            }
-        }
-
-        private byte[] Pack(string msg)
-        {
-            using (var memStream = new MemoryStream())
-            using (var writer = new BinaryWriter(memStream))
-            {
-                var payload = ToStream(msg);
-                var hash = GetHashFor(payload);
-                var length = 1 + payload.Length + hash.Length;
-
-                Console.WriteLine("Hash :" + hash.Length);
-                Console.WriteLine("Payload : " + payload.Length);
-                Console.WriteLine("Calc length :" + length);
-
-                writer.Write(length);
-
-                writer.Write((byte) 0);
-                writer.Write(hash);
-
-                Console.WriteLine("Position : " + memStream.Position);
-
-                writer.Write(payload.GetBuffer(), 0, (int) payload.Length);
-
-                return memStream.GetBuffer();
-            }
+            Assert.That(msg, Is.EqualTo(org2));
         }
 
         [Test]
@@ -96,12 +54,6 @@ namespace LightRail
             return formatter.Deserialize(stream);
         }
 
-        public static byte[] GetHashFor(Stream s)
-        {
-            using (var md5 = MD5.Create())
-                return md5.ComputeHash(s);
-        }
-
         private static string NamingScheme(string prefix, int position)
         {
             return string.Format("{0}{1}.sf", prefix, position.ToString("D12"));
@@ -110,6 +62,57 @@ namespace LightRail
 
     public class Op
     {
-         
+        public byte[] Payload { get; private set; }
+        public byte[] Hash { get; private set; }
+        public long Length { get; private set; }
+
+        public Op(byte[] payload)
+        {
+            Payload = payload;
+            Hash = GetHashFor(payload);
+            Length = Payload.Length + Hash.Length + 1;
+        }
+
+        public Op(byte[] payload, byte[] hash, long length)
+        {
+            Payload = payload;
+            Hash = hash;
+            Length = length;
+        }
+
+        public void WriteTo(BinaryWriter writer)
+        {
+            Console.WriteLine("Hash : " + Hash.Length);
+            Console.WriteLine("Payload : " + Payload.Length);
+            Console.WriteLine("Length : " + Length);
+
+            writer.Write(Length);
+            writer.Write((byte)0);
+            writer.Write(Hash);
+            writer.Write(Payload);
+        }
+
+        public static Op ReadFrom(BinaryReader reader)
+        {
+            var length = reader.ReadInt64();
+            var delivered = reader.ReadByte();
+            var hash = reader.ReadBytes(16);
+
+            var payloadLength = length - hash.Length - 1;
+            var payload = reader.ReadBytes((int)payloadLength);
+
+            Console.WriteLine("Hash :" + hash.Length);
+            Console.WriteLine("Payload : " + payload.Length);
+            Console.WriteLine("Length : " + length);
+
+            return new Op(payload, hash, length);
+        }
+
+
+        public static byte[] GetHashFor(byte[] payload)
+        {
+            using (var md5 = MD5.Create())
+                return md5.ComputeHash(new MemoryStream(payload));
+        }
     }
 }
