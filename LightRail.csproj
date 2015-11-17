@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="BNodeSpec.cs" />
     <Compile Include="BTree.cs" />
+    <Compile Include="Oplog.cs" />
     <Compile Include="OpLogSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
