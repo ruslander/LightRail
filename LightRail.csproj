@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiOpLog2.cs" />
     <Compile Include="BNodeSpec.cs" />
     <Compile Include="BTree.cs" />
     <Compile Include="FlirtSpec.cs" />
