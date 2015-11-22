@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NSubstitute">
+      <HintPath>packages\NSubstitute.1.9.2.0\lib\net45\NSubstitute.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -44,12 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiOpLog2.cs" />
-    <Compile Include="BNodeSpec.cs" />
-    <Compile Include="BTree.cs" />
+    <Compile Include="OplogSpec.cs" />
+    <Compile Include="Try\BNodeSpec.cs" />
+    <Compile Include="Try\BTree.cs" />
     <Compile Include="FlirtSpec.cs" />
     <Compile Include="Op.cs" />
-    <Compile Include="Oplog.cs" />
-    <Compile Include="OpLogSpec.cs" />
+    <Compile Include="Try\OplogV0.cs" />
+    <Compile Include="Try\OpLogV0Spec.cs" />
     <Compile Include="OpSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace LightRail
 {
-    public class Oplog : IDisposable
+    public class OplogV0 : IDisposable
     {
         private readonly string _prefix;
 
@@ -17,7 +17,7 @@ namespace LightRail
 
         long _position = 0;
 
-        public Oplog(string prefix)
+        public OplogV0(string prefix)
         {
             _prefix = prefix;
 

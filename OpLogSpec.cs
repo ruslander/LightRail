@@ -1,106 +1,119 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Linq;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace LightRail
 {
-    [TestFixture]
-    public class OpLogSpec
+    public interface IManageSegments
     {
-        [TestFixtureSetUp]
-        public void SetUp()
+        List<FileSegment> GetAll();
+        FileSegment AllocateSegment(string prefix, long position);
+    }
+
+    public class SegmentManager : IManageSegments
+    {
+        public List<FileSegment> GetAll()
         {
-            foreach (var file in Directory.GetFiles(".", "*.sf"))
-                File.Delete(file);
+            return Directory.GetFiles(".", "*.sf")
+                .OrderBy(x=>x)
+                .Select(x=> new FileSegment(){Name = x}).ToList();
         }
 
-        [Test]
-        public void Append()
+        public FileSegment AllocateSegment(string prefix, long position)
         {
-            var append = new Oplog("");
+            var name = string.Format("{0}{1}.sf", prefix, position.ToString("D12"));
 
-            for (var w = 0; w < 1000*100; w++)
-            {
-                var pos = append.Append(new[] { (byte)w });
-                
-                if(pos % 1000 == 0)
-                    Console.WriteLine(pos);
-            }
-
-            append.Dispose();
-
-            var read = new Oplog("");
-            var op = read.Read(1794000);
-
-            Assert.That(op, Is.Not.Null);
-
+            return new FileSegment() { Name = name };
         }
+    }
 
-        [Test]
-        public void MultiOpWriteRead()
+    public class FileSegment
+    {
+        public string Name { get; set; }
+        public BinaryWriter Writer { get; set; }
+    }
+
+    public class Oplog
+    {
+        public const int Mb = 1048576;
+        public string Name { get; set; }
+
+        public List<FileSegment> Segments;
+        public FileSegment CurrentSegment;
+
+        public IManageSegments ManageSegments;
+
+        public Oplog(string name) : this(name, new SegmentManager()){}
+
+        public Oplog(string name, IManageSegments sm)
         {
-            var storage = new MemoryStream();
+            Name = name;
 
-            var quotes = new string[]
-            {
-                "Frugality without creativity is deprivation.",
-                "Use, do not abuse; neither abstinence nor excess ever renders man happy.",
-                "Prosperity is only an instrument to be used, not a deity to be worshipped.",
-                "It's very important that we start creating new content again. We can only build on nostalgia so much before we have nothing left to build on.",
-            };
-
-            var writer = new BinaryWriter(storage);
-            foreach (var quote in quotes)
-            {
-                var msgStream = Encoding.Unicode.GetBytes(quote);
-                var op = new Op(msgStream);
-
-                op.WriteTo(writer);
-
-                Console.WriteLine("w" + storage.Position);
-            }
-
-            storage.Position = 0;
-
-            var reader = new BinaryReader(storage);
-            foreach (var quote in quotes)
-            {
-                var result = Op.ReadFrom(reader);
-                var org2 = Encoding.Unicode.GetString(result.Payload);
-
-                Console.WriteLine("r" + storage.Position);
-                Assert.That(quote, Is.EqualTo(org2));
-            }
-        }
-
-        [Test]
-        public void SingleOpWriteRead()
-        {
-            var storage = new MemoryStream();
-
-            const string msg = "this is the hello world";
+            var segments = sm.GetAll();
             
-            var msgStream = Encoding.Unicode.GetBytes(msg);
-            var op = new Op(msgStream);
+            Segments = segments;
 
-            var writer = new BinaryWriter(storage);
-            op.WriteTo(writer);
+            if(segments.Any())
+                CurrentSegment = segments.LastOrDefault();
+            else
+            {
+                CurrentSegment = sm.AllocateSegment(Name,0);
+            }
+        }
 
-            storage.Position = 0;
-            var reader = new BinaryReader(storage);
-            var result = Op.ReadFrom(reader);
+        public void Append(byte[] payload)
+        {
+            var op = new Op(payload);
 
-            var org2 = Encoding.Unicode.GetString(result.Payload);
+            op.WriteTo(CurrentSegment.Writer); 
+        }
+    }
 
-            Assert.That(msg, Is.EqualTo(org2));
+    [TestFixture]
+    public class OplogSpec
+    {
+        [Test]
+        public void ctor_loads_last_segment()
+        {
+            var sm = Substitute.For<IManageSegments>();
+            sm.GetAll().Returns(new List<FileSegment>() { new FileSegment() { Name = "f1" }, new FileSegment() { Name = "f2" } });
+
+            var sut = new Oplog("a", sm);
+
+            Assert.That(sut.Segments.Count, Is.EqualTo(2));
+            Assert.That(sut.CurrentSegment.Name, Is.EqualTo("f2"));
         }
 
         [Test]
-        public void NamingWithPaddingZeros()
+        public void ctor_will_create_new_segemnt()
         {
-            Assert.That(new Oplog("out.").NamingScheme(0), Is.EqualTo("out.000000000000.sf"));
-            Assert.That(new Oplog("in.").NamingScheme(4000000),  Is.EqualTo("in.000004000000.sf"));
+            var sm = Substitute.For<IManageSegments>();
+            sm.GetAll().Returns(new List<FileSegment>() { });
+            sm.AllocateSegment("a", 0).Returns(new FileSegment());
+
+            var sut = new Oplog("a", sm);
+
+            Assert.That(sut.CurrentSegment, Is.Not.Null);
+        }
+
+
+        [Test]
+        public void appent_uses_current_segment()
+        {
+            var storage = new MemoryStream();
+            var fileSegment = new FileSegment() { Writer = new BinaryWriter(storage) };
+
+            var sm = Substitute.For<IManageSegments>();
+            sm.GetAll().Returns(new List<FileSegment>() { });
+            sm.AllocateSegment("a", 0).Returns(fileSegment);
+
+            var sut = new Oplog("a", sm);
+            sut.Append(new byte[] {1});
+
+            Assert.That(storage.ToArray().Length, Is.EqualTo(25));
         }
     }
 }
