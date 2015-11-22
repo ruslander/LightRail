@@ -47,8 +47,10 @@
     <Compile Include="BNodeSpec.cs" />
     <Compile Include="BTree.cs" />
     <Compile Include="FlirtSpec.cs" />
+    <Compile Include="Op.cs" />
     <Compile Include="Oplog.cs" />
     <Compile Include="OpLogSpec.cs" />
+    <Compile Include="OpSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
