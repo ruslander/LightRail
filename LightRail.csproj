@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Oplog.cs" />
+    <Compile Include="OplogEndToEndSpec.cs" />
     <Compile Include="OplogSpec.cs" />
     <Compile Include="Try\BNodeSpec.cs" />
     <Compile Include="Try\BTree.cs" />
