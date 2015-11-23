@@ -46,11 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiOpLog2.cs" />
+    <Compile Include="Oplog.cs" />
     <Compile Include="OplogSpec.cs" />
     <Compile Include="Try\BNodeSpec.cs" />
     <Compile Include="Try\BTree.cs" />
-    <Compile Include="FlirtSpec.cs" />
+    <Compile Include="ApiOpLog2Spec.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="Try\OplogV0.cs" />
     <Compile Include="Try\OpLogV0Spec.cs" />
