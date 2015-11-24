@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
@@ -19,21 +20,35 @@ namespace LightRail
         [Test]
         public void append_1_mln()
         {
-            var sut = new Oplog("a", new SegmentManager("a"));
+            var writterLog = new Oplog();
 
-            var watch = Stopwatch.StartNew();
+            var writterWatch = Stopwatch.StartNew();
 
-            for (int i = 0; i < 1000000; i++)
-            {
-                sut.Append(Encoding.Unicode.GetBytes("hello world"));
-            }
+            const int ops = 1000000;
 
-            watch.Stop();
+            for (int i = 0; i < ops; i++)
+                writterLog.Append(Encoding.Unicode.GetBytes(i.ToString()));
 
-            Console.WriteLine();
-            Console.WriteLine("Ops                  : " + 1000000);
-            Console.WriteLine("Duraton              : " + TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds));
-            Console.WriteLine("Sync     (millisec)  : " + (((float)watch.ElapsedMilliseconds / 1000000)));
+            writterWatch.Stop();
+
+            writterLog.Flush();
+
+            var readerLog = new Oplog();
+
+            var readerWatch = Stopwatch.StartNew();
+            var reads = readerLog.Forward().Count();
+            readerWatch.Stop();
+
+
+            Console.WriteLine("Writes            : " + ops);
+            Console.WriteLine("Write Timespan    : " + TimeSpan.FromMilliseconds(writterWatch.ElapsedMilliseconds));
+            Console.WriteLine("Write Duraton     : " + (((float)writterWatch.ElapsedMilliseconds / 1000000)));
+            
+            Console.WriteLine("");
+
+            Console.WriteLine("Reads             : " + reads);
+            Console.WriteLine("Reads Timespan    : " + TimeSpan.FromMilliseconds(readerWatch.ElapsedMilliseconds));
+            Console.WriteLine("Read Duraton      : " + (((float)readerWatch.ElapsedMilliseconds / 1000000)));
         }
     }
 }

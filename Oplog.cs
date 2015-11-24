@@ -26,9 +26,11 @@ namespace LightRail
             if (!_persistent)
                 return new List<FileSegment>();
 
-            return Directory.GetFiles(".", string.Format("{0}*.sf", _name))
-                .OrderBy(x => x)
-                .Select(x => new FileSegment() { Name = Path.GetFileName(x) }).ToList();
+            return Directory
+                .GetFiles(".", string.Format("{0}*.sf", _name))
+                .Select(FileSegment.AsReadonly)
+                .OrderBy(x => x.Position)
+                .ToList();
         }
 
         public FileSegment AllocateSegment(long position)
@@ -40,7 +42,6 @@ namespace LightRail
             if (_persistent)
             {
                 backStream = new FileStream(name, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-                //backStream.SetLength(Size);
             }
             else
                 backStream = new MemoryStream();
@@ -55,8 +56,35 @@ namespace LightRail
 
     public class FileSegment
     {
+        public static FileSegment AsReadonly(string path)
+        {
+            var name = Path.GetFileName(path);
+            var reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            var position = long.Parse(name.Split('.')[0]); // 000014680064.sf
+
+            return new FileSegment()
+            {
+                Name = name,
+                Reader = reader,
+                Position = position
+            };
+        }
+
+        public long Position { get; set; }
         public string Name { get; set; }
         public BinaryWriter Writer { get; set; }
+        public BinaryReader Reader { get; set; }
+
+        public override string ToString()
+        {
+            return Name + " readonly: " + (Writer == null) ;
+        }
+
+        public void Flush()
+        {
+            if(Writer!= null)
+                Writer.Flush();
+        }
     }
 
     public class Oplog
@@ -69,7 +97,7 @@ namespace LightRail
 
         public IManageSegments ManageSegments;
 
-        public Oplog(string name) : this(name, new SegmentManager(name)) { }
+        public Oplog(string name = "") : this(name, new SegmentManager(name)) { }
 
         public Oplog(string name, IManageSegments sm)
         {
@@ -110,6 +138,22 @@ namespace LightRail
             }
 
             op.WriteTo(CurrentSegment.Writer);
+        }
+
+        public IEnumerable<Op> Forward(int position = 0, int sliceSize = int.MaxValue)
+        {
+            foreach (var segment in Segments)
+            {
+                while (segment.Reader.BaseStream.Position != segment.Reader.BaseStream.Length)
+                {
+                    yield return Op.ReadFrom(segment.Reader);
+                }
+            }
+        }
+
+        public void Flush()
+        {
+            Segments.ForEach(x=>x.Flush());
         }
     }
 }
