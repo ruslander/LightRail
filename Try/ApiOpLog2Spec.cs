@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace LightRail
+namespace LightRail.Try
 {
     class ApiOpLog2
     {

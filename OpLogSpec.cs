@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using LightRail.Core;
 using NSubstitute;
 using NUnit.Framework;
 

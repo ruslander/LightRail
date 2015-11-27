@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using LightRail.Core;
 using NUnit.Framework;
 
 namespace LightRail

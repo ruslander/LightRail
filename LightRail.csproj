@@ -46,13 +46,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Oplog.cs" />
+    <Compile Include="Core\Block.cs" />
+    <Compile Include="BlockSpec.cs" />
+    <Compile Include="Core\FileSegment.cs" />
+    <Compile Include="Core\IManageSegments.cs" />
+    <Compile Include="Core\Oplog.cs" />
+    <Compile Include="Core\SegmentManager.cs" />
     <Compile Include="OplogEndToEndSpec.cs" />
     <Compile Include="OplogSpec.cs" />
     <Compile Include="Try\BNodeSpec.cs" />
     <Compile Include="Try\BTree.cs" />
-    <Compile Include="ApiOpLog2Spec.cs" />
-    <Compile Include="Op.cs" />
+    <Compile Include="Try\ApiOpLog2Spec.cs" />
+    <Compile Include="Core\Op.cs" />
     <Compile Include="Try\OplogV0.cs" />
     <Compile Include="Try\OpLogV0Spec.cs" />
     <Compile Include="OpSpec.cs" />
