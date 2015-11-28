@@ -5,11 +5,8 @@ using System.Linq;
 namespace LightRail.Core
 {
     public class BlockFullException : Exception { }
-
     public class Block
     {
-        const int BlockSize = 4096; // 4k
-
         public readonly byte[] Payload;
 
         public Block(byte[] payload)
@@ -19,7 +16,7 @@ namespace LightRail.Core
 
         public static Block New()
         {
-            return new Block(new byte[BlockSize]);
+            return new Block(new byte[Units.KILO * 4]);
         }
 
         public void Append(byte[] record)

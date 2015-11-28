@@ -6,7 +6,6 @@ using NUnit.Framework;
 
 namespace LightRail
 {
-
     [TestFixture]
     public class BlockSpec
     {
