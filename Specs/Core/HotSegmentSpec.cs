@@ -3,15 +3,15 @@ using System.Linq;
 using LightRail.Core;
 using NUnit.Framework;
 
-namespace LightRail
+namespace LightRail.Specs.Core
 {
     [TestFixture]
-    public class SegmentSpec
+    public class HotSegmentSpec
     {
         [Test]
         public void AppendBeforeReachingMaxCapacityTest()
         {
-            var activeSegment = new Segment(45 * Units.MEGA);
+            var activeSegment = new HotSegment(45 * Units.MEGA);
 
             for (var i = 0; i < 10 * 100 * 1000; i++)
             {
@@ -27,7 +27,7 @@ namespace LightRail
         [Test]
         public void AppendStopsAtMaxCapacityTest()
         {
-            var activeSegment = new Segment(10 * Units.KILO);
+            var activeSegment = new HotSegment(10 * Units.KILO);
 
             try
             {
@@ -38,7 +38,7 @@ namespace LightRail
                     activeSegment.Append(next);
                 }
             }
-            catch (SegmentFullException)
+            catch (HotSegmentFullException)
             {
             }
 

@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using LightRail.Core;
 using NUnit.Framework;
 
-namespace LightRail
+namespace LightRail.Specs.Core
 {
     /*
      

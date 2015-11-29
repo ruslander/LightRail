@@ -45,6 +45,19 @@ namespace LightRail.Core
             return new Op(payload, hash, localPosition);
         }
 
+        public static Op ReadFrom(byte[] record, long position)
+        {
+            var reader = new BinaryReader(new MemoryStream(record));
+
+            var length = reader.ReadInt64();
+            var hash = reader.ReadBytes(16);
+
+            var payloadLength = length - hash.Length - 8;
+            var payload = reader.ReadBytes((int)payloadLength);
+
+            return new Op(payload, hash, position);
+        }
+
         public static byte[] GetHashFor(byte[] payload)
         {
             using (var md5 = MD5.Create())

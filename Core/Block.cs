@@ -72,5 +72,10 @@ namespace LightRail.Core
                 yield return payload;
             }
         }
+
+        public override string ToString()
+        {
+            return "Records " + Records().Count;
+        }
     }
 }
