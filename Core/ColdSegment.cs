@@ -9,6 +9,7 @@ namespace LightRail.Core
     {
         public long Position { get; set; }
         public string Name { get; set; }
+        public BinaryReader Reader { get; set; }
 
         public IEnumerable<Block> FetchForward()
         {
@@ -16,11 +17,16 @@ namespace LightRail.Core
 
             Console.WriteLine("Fetch file#{0} {1}", Position, Name);
 
-            var blockBuff = new byte[Units.KILO * 4];
+            var blockBuffer = new byte[Units.KILO * 4];
 
-            while (Reader.Read(blockBuff, 0, blockBuff.Length) > 0)
+            while (Reader.Read(blockBuffer, 0, blockBuffer.Length) > 0)
             {
-                yield return new Block(blockBuff);
+                var block = new Block(blockBuffer);
+                
+                if (block.Records().Count == 0)
+                    break;
+
+                yield return block;
             }
         }
 
@@ -28,28 +34,28 @@ namespace LightRail.Core
         {
             Console.WriteLine("Fetch file#{0} {1}", Position, Reader.BaseStream.Length);
 
-            var blockBuff = new byte[Units.KILO * 4];
+            var blockBuffer = new byte[Units.KILO * 4];
 
-            var offset = Reader.BaseStream.Length - blockBuff.Length;
+            var offset = Reader.BaseStream.Length - blockBuffer.Length;
 
             while (offset >= 0)
             {
                 Reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-                Reader.Read(blockBuff, 0, blockBuff.Length);
+                Reader.Read(blockBuffer, 0, blockBuffer.Length);
 
-                yield return new Block(blockBuff);
+                yield return new Block(blockBuffer);
 
-                offset = offset - blockBuff.Length;
+                offset = offset - blockBuffer.Length;
             }
         }
 
-        public BinaryReader Reader { get; set; }
-
-        public static ISegment AsReadonly(string path, string prefix = "")
+        public static ISegment Load(string path, string prefix = "")
         {
             var name = Path.GetFileName(path);
-            var reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
+            var reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read,4096));
             var position = long.Parse(name.Replace(prefix,"").Split('.')[0]); // 000014680064.sf
+
+            reader.BaseStream.Position = 0;
 
             return new ColdSegment()
             {

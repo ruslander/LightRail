@@ -50,7 +50,7 @@ namespace LightRail.Specs.Io
              Assert.That(ops.Count(), Is.EqualTo(100));
          }
 
-         [Test]
+        [Test]
          public void ReopenLastSegmentTest()
          {
              var wr = new Oplog2("c", 4 * Units.KILO);
@@ -77,7 +77,7 @@ namespace LightRail.Specs.Io
              Assert.That(rdRecords, Is.EqualTo(wrRecords + 1));
          }
 
-         [Test]
+        [Test]
          public void ListForwardTest()
          {
              var wr = new Oplog2("d", 4 * Units.KILO);
@@ -101,7 +101,7 @@ namespace LightRail.Specs.Io
              }
          }
 
-         [Test]
+        [Test]
          public void ListBackwardTest()
          {
              var wr = new Oplog2("e", 4 * Units.KILO);
@@ -126,5 +126,31 @@ namespace LightRail.Specs.Io
                  prev = position;
              }
          }
+
+        [Test]
+        public void DefaultSizeMultiAppendReadCountsTest()
+        {
+            var wr = new Oplog2("f");
+
+            for (int i = 0; i < 100; i++)
+                wr.Append(Guid.NewGuid().ToByteArray());
+
+            wr.Dispose();
+
+            Assert.That(wr.Segments[0].FetchForward().Count(), Is.EqualTo(2));
+            Assert.That(wr.CurrentSegment.Blocks.Count, Is.EqualTo(2));
+            Assert.That(wr.CurrentSegment.Blocks.Select(x => x.Records().Count).Sum(), Is.EqualTo(100));
+
+
+            var rd = new Oplog2("f");
+            var ops = rd.Forward().ToList();
+
+            foreach (var op in ops)
+                new Guid(op.Payload);
+
+            Assert.That(rd.Segments[0].FetchForward().Count(), Is.EqualTo(2));
+            Assert.That(rd.CurrentSegment.Blocks.Count, Is.EqualTo(2));
+            Assert.That(rd.CurrentSegment.Blocks.Select(x => x.Records().Count).Sum(), Is.EqualTo(100));
+        }
     }
 }

@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Core\Block.cs" />
     <Compile Include="Core\ColdSegment.cs" />
+    <Compile Include="Oplog2EndToEndSpec.cs" />
     <Compile Include="Specs\Core\BlockSpec.cs" />
     <Compile Include="Core\FileSegment.cs" />
     <Compile Include="Core\IManageSegments.cs" />

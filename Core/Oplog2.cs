@@ -21,7 +21,7 @@ namespace LightRail.Core
 
             Segments = Directory
                 .GetFiles(".", string.Format("{0}*.sf", _name))
-                .Select(x => ColdSegment.AsReadonly(x, _name))
+                .Select(x => ColdSegment.Load(x, _name))
                 .OrderBy(x => x.Position)
                 .ToList();
 
@@ -33,6 +33,8 @@ namespace LightRail.Core
             {
                 var last = Segments.Last();
                 var blocks = last.FetchForward().ToList();
+
+                Console.WriteLine("Last [{0}] {1}", last.Position, blocks.Count());
 
                 last.Dispose();
 
