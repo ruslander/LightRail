@@ -10,54 +10,9 @@ namespace LightRail.Core
     public interface ISegment
     {
         long Position { get; set; }
-        IEnumerable<Block> Fetch();
         void Dispose();
-    }
-
-    public class ColdSegment : ISegment
-    {
-        public long Position { get; set; }
-        public string Name { get; set; }
-
-        public IEnumerable<Block> Fetch()
-        {
-            Reader.BaseStream.Position = 0;
-
-            Console.WriteLine("Fetch {0} {1}", Position, Name);
-
-            var blockBuff = new byte[Units.KILO * 4];
-
-            while (Reader.Read(blockBuff, 0, blockBuff.Length) > 0)
-            {
-                yield return new Block(blockBuff);
-            }
-        }
-
-        public void Dispose()
-        {
-            Reader.Close();
-        }
-
-        public BinaryReader Reader { get; set; }
-
-        public static ISegment AsReadonly(string path, string prefix = "")
-        {
-            var name = Path.GetFileName(path);
-            var reader = new BinaryReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
-            var position = long.Parse(name.Replace(prefix,"").Split('.')[0]); // 000014680064.sf
-
-            return new ColdSegment()
-            {
-                Reader = reader,
-                Position = position,
-                Name = name
-            };
-        }
-
-        public override string ToString()
-        {
-            return string.Format("Blocks {0} Records {1}", Fetch().Count(), Fetch().Select(x => x.Records().Count).Sum());
-        }
+        IEnumerable<Block> FetchForward();
+        IEnumerable<Block> FetchBackward();
     }
 
     public class HotSegment : ISegment
@@ -66,9 +21,14 @@ namespace LightRail.Core
         public long Position { get; set; }
         public List<Block> Blocks { get; set; }
 
-        public IEnumerable<Block> Fetch()
+        public IEnumerable<Block> FetchForward()
         {
             return Blocks.AsEnumerable();
+        }
+
+        public IEnumerable<Block> FetchBackward()
+        {
+            return Enumerable.Reverse(Blocks);
         }
 
         public void Dispose()

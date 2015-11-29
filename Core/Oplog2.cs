@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace LightRail.Core
             else
             {
                 var last = Segments.Last();
-                var blocks = last.Fetch().ToList();
+                var blocks = last.FetchForward().ToList();
 
                 last.Dispose();
 
@@ -89,7 +90,7 @@ namespace LightRail.Core
             foreach (var segment in Segments)
             {
                 var blockOffset = 0;
-                foreach (Block block in segment.Fetch())
+                foreach (Block block in segment.FetchForward())
                 {
                     var opOffset = 0;
                     foreach (byte[] bytes in block.Forward())
@@ -104,6 +105,32 @@ namespace LightRail.Core
                 }
 
                 segmentOffset = segmentOffset + _segmentCapacity;
+            }
+        }
+
+        public IEnumerable<Op> Backward()
+        {
+            var segmentOffset = Segments.Count * _segmentCapacity;
+            foreach (var segment in Segments.ToList().OrderByDescending(x => x.Position))
+            {
+                segmentOffset = segmentOffset - _segmentCapacity;
+
+                var blockOffset = _segmentCapacity;
+                foreach (var block in segment.FetchBackward())
+                {
+                    blockOffset = blockOffset - block.Payload.Length;
+
+                    var opOffset = block.Payload.Length;
+                    var records = block.Forward().Reverse();
+
+                    foreach (var bytes in records)
+                    {
+                        opOffset = opOffset - bytes.Length;
+
+                        var position = segmentOffset + blockOffset + opOffset;
+                        yield return Op.ReadFrom(bytes, position);
+                    }
+                }
             }
         }
 
