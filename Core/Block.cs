@@ -7,6 +7,8 @@ namespace LightRail.Core
     public class BlockFullException : Exception { }
     public class Block
     {
+        public const long Size = Units.KILO*4;
+
         public readonly byte[] Payload;
 
         public Block(byte[] payload)
@@ -16,10 +18,10 @@ namespace LightRail.Core
 
         public static Block New()
         {
-            return new Block(new byte[Units.KILO * 4]);
+            return new Block(new byte[Size]);
         }
 
-        public void Append(byte[] record)
+        public int Append(byte[] record)
         {
             var usedCapacity = Records().Sum() + Records().Count * 4;
 
@@ -32,6 +34,8 @@ namespace LightRail.Core
             var size = BitConverter.GetBytes(record.Length);
             var sizeIdx = Payload.Length - Records().Count * 4;
             Array.Copy(size, 0, Payload, sizeIdx - 4, 4);
+
+            return appendStartingWith;
         }
 
         public List<int> Records()

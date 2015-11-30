@@ -36,16 +36,16 @@ namespace LightRail.Core
 
             var blockBuffer = new byte[Units.KILO * 4];
 
-            var offset = Reader.BaseStream.Length - blockBuffer.Length;
+            var idx = Reader.BaseStream.Length - blockBuffer.Length;
 
-            while (offset >= 0)
+            while (idx >= 0)
             {
-                Reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+                Reader.BaseStream.Seek(idx, SeekOrigin.Begin);
                 Reader.Read(blockBuffer, 0, blockBuffer.Length);
 
                 yield return new Block(blockBuffer.ToArray());
 
-                offset = offset - blockBuffer.Length;
+                idx = idx - blockBuffer.Length;
             }
         }
 

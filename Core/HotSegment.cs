@@ -11,6 +11,7 @@ namespace LightRail.Core
     {
         long Position { get; set; }
         void Dispose();
+
         IEnumerable<Block> FetchForward();
         IEnumerable<Block> FetchBackward();
     }
@@ -29,6 +30,13 @@ namespace LightRail.Core
         public IEnumerable<Block> FetchBackward()
         {
             return Enumerable.Reverse(Blocks);
+        }
+
+        public int RecordsCount()
+        {
+            return Blocks
+                .Select(x => x.Records().Count)
+                .Sum();
         }
 
         public void Dispose()
@@ -57,7 +65,7 @@ namespace LightRail.Core
             RollCurrentBlock();
         }
 
-        public void Append(byte[] next)
+        public long Append(byte[] next)
         {
             var op = new Op(next);
 
@@ -68,7 +76,7 @@ namespace LightRail.Core
 
             try
             {
-                BurnCurrentBlock(storage.ToArray());
+                return BurnCurrentBlock(storage.ToArray());
             }
             catch (BlockFullException)
             {
@@ -77,14 +85,16 @@ namespace LightRail.Core
 
                 RollCurrentBlock();
 
-                BurnCurrentBlock(storage.ToArray());
+                return BurnCurrentBlock(storage.ToArray());
             }
         }
 
-        private void BurnCurrentBlock(byte[] record)
+        private long BurnCurrentBlock(byte[] record)
         {
-            _current.Append(record);
+            var positionInBlock = _current.Append(record);
             Burner.Burn(_current, Blocks.Count);
+
+            return positionInBlock + (Blocks.Count - 1) * Block.Size;
         }
 
         private void RollCurrentBlock()

@@ -92,6 +92,16 @@ namespace LightRail.Specs.Core
             Assert.That(BitConverter.ToInt32(layout, 46), Is.EqualTo(4));
         }
 
+        [Test]
+        public void Append_returns_index()
+        {
+            var layout = new byte[50];
+            var block = new Block(layout);
+
+            Assert.That(block.Append(BitConverter.GetBytes(1111)), Is.EqualTo(0));
+            Assert.That(block.Append(BitConverter.GetBytes(2222)), Is.EqualTo(4));
+        }
+
         [Test,ExpectedException(typeof(BlockFullException))]
         public void BlockFullException_when_full()
         {

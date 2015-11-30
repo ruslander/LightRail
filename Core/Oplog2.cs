@@ -50,22 +50,25 @@ namespace LightRail.Core
             }
         }
 
-        public Oplog2(string name) : this(name, 4 * Units.MEGA)
+        public Oplog2(string name = "") : this(name, 4 * Units.MEGA)
         {
         }
 
-        public void Append(byte[] content)
+        public long Append(byte[] content)
         {
+            long current = 0;
             try
             {
-                CurrentSegment.Append(content);
+                current = CurrentSegment.Append(content);
             }
             catch (HotSegmentFullException)
             {
                 RollNewSegment();
 
-                CurrentSegment.Append(content);
+                current = CurrentSegment.Append(content);
             }
+
+            return current + (Segments.Count - 1) * _segmentCapacity;
         }
 
         private void RollNewSegment()
@@ -86,7 +89,7 @@ namespace LightRail.Core
             //Console.WriteLine("Rolling [{0}] {1}", _name, position);
         }
 
-        public IEnumerable<Op> Forward()
+        public IEnumerable<Op> Forward(int position = 0, int sliceSize = int.MaxValue)
         {
             long segmentOffset = 0;
             foreach (var segment in Segments)
@@ -97,8 +100,8 @@ namespace LightRail.Core
                     var opOffset = 0;
                     foreach (byte[] bytes in block.Forward())
                     {
-                        var position = segmentOffset + blockOffset + opOffset;
-                        yield return Op.ReadFrom(bytes, position);
+                        var idx = segmentOffset + blockOffset + opOffset;
+                        yield return Op.ReadFrom(bytes, idx);
 
                         opOffset = opOffset + bytes.Length;
                     }
