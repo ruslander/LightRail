@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using LightRail.Core;
+using LightRail;
 using NUnit.Framework;
 
-namespace LightRail.Specs
+namespace Specs
 {
     [TestFixture]
     public class BlockSpec

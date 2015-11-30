@@ -2,7 +2,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace LightRail.Specs.Io
+namespace Specs
 {
     public class SpecificationWithFile
     {

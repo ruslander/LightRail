@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using LightRail.Core;
-using LightRail.Specs.Io;
+using LightRail;
 using NUnit.Framework;
 
-namespace LightRail.Specs
+namespace Specs
 {
     class ApiOpLog2
     {
@@ -44,7 +42,7 @@ namespace LightRail.Specs
         [Test]
         public void Append()
         {
-            var log = new Oplog2(Filename);
+            var log = new Oplog(Filename);
 
             log.Append(BitConverter.GetBytes(1));
 
@@ -54,7 +52,7 @@ namespace LightRail.Specs
         [Test]
         public void Forward()
         {
-            var log = new Oplog2(Filename);
+            var log = new Oplog(Filename);
 
             log.Append(BitConverter.GetBytes(1));
             log.Append(BitConverter.GetBytes(2));
@@ -83,7 +81,7 @@ namespace LightRail.Specs
         [Test]
         public void Backward()
         {
-            var log = new Oplog2(Filename);
+            var log = new Oplog(Filename);
 
             log.Append(BitConverter.GetBytes(1));
             log.Append(BitConverter.GetBytes(2));
@@ -112,7 +110,7 @@ namespace LightRail.Specs
         [Test,Ignore]
         public void Forward_a_slice()
         {
-            var log = new Oplog2(Filename);
+            var log = new Oplog(Filename);
 
             log.Append(BitConverter.GetBytes(1));
             log.Append(BitConverter.GetBytes(2));

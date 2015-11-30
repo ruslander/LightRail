@@ -1,7 +1,7 @@
 using System.IO;
 using System.Security.Cryptography;
 
-namespace LightRail.Core
+namespace LightRail
 {
     public class Op
     {

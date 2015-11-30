@@ -1,10 +1,10 @@
 using System.IO;
 using System.Linq;
-using LightRail.Core;
+using LightRail;
 using LightRail.Specs.Io;
 using NUnit.Framework;
 
-namespace LightRail.Specs
+namespace Specs
 {
     [TestFixture]
     public class OplogBurnerSpec : SpecificationWithFile

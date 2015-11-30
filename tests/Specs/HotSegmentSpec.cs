@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using LightRail.Core;
+using LightRail;
 using NUnit.Framework;
 
-namespace LightRail.Specs
+namespace Specs
 {
     [TestFixture]
     public class HotSegmentSpec

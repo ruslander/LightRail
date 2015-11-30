@@ -3,13 +3,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using LightRail.Core;
+using LightRail;
 using NUnit.Framework;
 
-namespace LightRail
+namespace Specs
 {
     [TestFixture]
-    public class Oplog2EndToEndSpec
+    public class OplogEndToEndSpec
     {
         [TestFixtureSetUp]
         public void SetUp()
@@ -24,7 +24,7 @@ namespace LightRail
             const int ops = 1000000;
             //const int ops = 100;
 
-            var wl = new Oplog2("a");
+            var wl = new Oplog("a");
             var wlWatch = Stopwatch.StartNew();
 
             for (int i = 0; i < ops; i++)
@@ -33,7 +33,7 @@ namespace LightRail
             wlWatch.Stop();
             wl.Dispose();
 
-            var rl = new Oplog2("a");
+            var rl = new Oplog("a");
 
             var rlWatch = Stopwatch.StartNew();
             var reads = rl.Forward().Count();

@@ -1,4 +1,4 @@
-namespace LightRail.Core
+namespace LightRail
 {
     public static class Units
     {

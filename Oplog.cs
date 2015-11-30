@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace LightRail.Core
+namespace LightRail
 {
-    public class Oplog2 : IDisposable
+    public class Oplog : IDisposable
     {
         private readonly string _name;
         private readonly long _segmentCapacity;
@@ -14,7 +13,7 @@ namespace LightRail.Core
         public readonly List<ISegment> Segments;
         public HotSegment CurrentSegment;
 
-        public Oplog2(string name, long segmentCapacity)
+        public Oplog(string name, long segmentCapacity)
         {
             _name = name;
             _segmentCapacity = segmentCapacity;
@@ -50,7 +49,7 @@ namespace LightRail.Core
             }
         }
 
-        public Oplog2(string name = "") : this(name, 4 * Units.MEGA)
+        public Oplog(string name = "") : this(name, 4 * Units.MEGA)
         {
         }
 

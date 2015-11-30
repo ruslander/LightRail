@@ -1,9 +1,9 @@
 using System.IO;
 using System.Security.Cryptography;
-using LightRail.Core;
+using LightRail;
 using NUnit.Framework;
 
-namespace LightRail.Specs
+namespace Specs
 {
     /*
      

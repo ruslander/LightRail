@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace LightRail.Core
+namespace LightRail
 {
     public class HotSegmentBurner : IDisposable
     {

@@ -1,19 +1,19 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using LightRail.Core;
+using LightRail;
 using LightRail.Specs.Io;
 using NUnit.Framework;
 
-namespace LightRail.Specs
+namespace Specs
 {
     [TestFixture]
-    public class Oplog2Spec : SpecificationWithFile
+    public class OplogSpec : SpecificationWithFile
     {
          [Test]
          public void AppendTest()
          {
-             var log = new Oplog2(Filename);
+             var log = new Oplog(Filename);
              log.Append(Guid.NewGuid().ToByteArray());
 
              Assert.That(File.Exists(Filename+"000000000000.sf"), Is.True);
@@ -25,7 +25,7 @@ namespace LightRail.Specs
          [Test]
          public void MultiAppendReadCountsTest()
          {
-             var wr = new Oplog2(Filename, 4 * Units.KILO);
+             var wr = new Oplog(Filename, 4 * Units.KILO);
 
              for (int i = 0; i < 100; i++)
                  wr.Append(Guid.NewGuid().ToByteArray());
@@ -35,7 +35,7 @@ namespace LightRail.Specs
              Assert.That(File.Exists(Filename + "000000000000.sf"), Is.True);
              Assert.That(File.Exists(Filename + "000000004096.sf"), Is.True);
 
-             var rd = new Oplog2(Filename, 100 * Units.KILO);
+             var rd = new Oplog(Filename, 100 * Units.KILO);
              var ops = rd.Forward().ToList();
 
              foreach (var op in ops)
@@ -47,14 +47,14 @@ namespace LightRail.Specs
         [Test]
          public void ReopenLastSegmentTest()
          {
-             var wr = new Oplog2(Filename, 4 * Units.KILO);
+             var wr = new Oplog(Filename, 4 * Units.KILO);
 
              for (int i = 0; i < 100; i++)
                  wr.Append(Guid.NewGuid().ToByteArray());
 
              wr.Dispose();
 
-             var rd = new Oplog2(Filename, 4 * Units.KILO);
+             var rd = new Oplog(Filename, 4 * Units.KILO);
                 rd.Append(Guid.NewGuid().ToByteArray());
              
              Assert.That(rd.CurrentSegment.Position, Is.EqualTo(4096));
@@ -74,14 +74,14 @@ namespace LightRail.Specs
         [Test]
          public void ListForwardTest()
          {
-             var wr = new Oplog2(Filename, 4 * Units.KILO);
+             var wr = new Oplog(Filename, 4 * Units.KILO);
 
              for (int i = 0; i < 100; i++)
                  wr.Append(Guid.NewGuid().ToByteArray());
 
              wr.Dispose();
 
-             var rd = new Oplog2(Filename, 4 * Units.KILO);
+             var rd = new Oplog(Filename, 4 * Units.KILO);
 
              long prev = -1;
 
@@ -98,14 +98,14 @@ namespace LightRail.Specs
         [Test]
          public void ListBackwardTest()
          {
-             var wr = new Oplog2(Filename, 4 * Units.KILO);
+             var wr = new Oplog(Filename, 4 * Units.KILO);
 
              for (int i = 0; i < 100; i++)
                  wr.Append(BitConverter.GetBytes(i));
 
              wr.Dispose();
 
-             var rd = new Oplog2(Filename, 4 * Units.KILO);
+             var rd = new Oplog(Filename, 4 * Units.KILO);
 
              long prev = long.MaxValue;
 
@@ -124,7 +124,7 @@ namespace LightRail.Specs
         [Test]
         public void DefaultSizeMultiAppendReadCountsTest()
         {
-            var wr = new Oplog2(Filename);
+            var wr = new Oplog(Filename);
 
             for (int i = 0; i < 100; i++)
                 wr.Append(Guid.NewGuid().ToByteArray());
@@ -136,7 +136,7 @@ namespace LightRail.Specs
             Assert.That(wr.CurrentSegment.Blocks.Select(x => x.Records().Count).Sum(), Is.EqualTo(100));
 
 
-            var rd = new Oplog2(Filename);
+            var rd = new Oplog(Filename);
             var ops = rd.Forward().ToList();
 
             foreach (var op in ops)
