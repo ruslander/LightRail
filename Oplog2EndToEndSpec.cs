@@ -18,11 +18,11 @@ namespace LightRail
                 File.Delete(file);
         }
 
-        [Test]
+        [Test,Ignore]
         public void append_1_mln()
         {
-            //const int ops = 1000000;
-            const int ops = 100;
+            const int ops = 1000000;
+            //const int ops = 100;
 
             var wl = new Oplog2("a");
             var wlWatch = Stopwatch.StartNew();

@@ -21,7 +21,7 @@ namespace LightRail.Core
 
             while (Reader.Read(blockBuffer, 0, blockBuffer.Length) > 0)
             {
-                var block = new Block(blockBuffer);
+                var block = new Block(blockBuffer.ToArray());
                 
                 if (block.Records().Count == 0)
                     break;
@@ -43,7 +43,7 @@ namespace LightRail.Core
                 Reader.BaseStream.Seek(offset, SeekOrigin.Begin);
                 Reader.Read(blockBuffer, 0, blockBuffer.Length);
 
-                yield return new Block(blockBuffer);
+                yield return new Block(blockBuffer.ToArray());
 
                 offset = offset - blockBuffer.Length;
             }
