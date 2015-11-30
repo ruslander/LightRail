@@ -1,21 +1,15 @@
 using System.IO;
 using System.Linq;
 using LightRail.Core;
+using LightRail.Specs.Io;
 using NUnit.Framework;
 
-namespace LightRail.Specs.Io
+namespace LightRail.Specs
 {
     [TestFixture]
-    public class OplogBurnerSpec
+    public class OplogBurnerSpec : SpecificationWithFile
     {
         private int cap = 100;
-
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-            foreach (var file in Directory.GetFiles(".", "*.sf"))
-                File.Delete(file);
-        }
 
         [Test]
         public void BurnTest()
@@ -23,7 +17,7 @@ namespace LightRail.Specs.Io
             var c1 = new byte[20];
             ByteArray.FillArrayRandomly(c1);
 
-            var burner = new HotSegmentBurner("a", cap, 1);
+            var burner = new HotSegmentBurner(Filename, cap, 1);
             burner.Burn(new Block(c1), 1);
             burner.Dispose();
 
@@ -41,7 +35,7 @@ namespace LightRail.Specs.Io
             var c2 = new byte[20];
             ByteArray.FillArrayRandomly(c2);
 
-            var burner = new HotSegmentBurner("b",cap, 2);
+            var burner = new HotSegmentBurner(Filename, cap, 2);
             burner.Burn(new Block(c1), 1);
             burner.Burn(new Block(c2), 2);
             burner.Dispose();
@@ -61,7 +55,7 @@ namespace LightRail.Specs.Io
             var c2 = new byte[20];
             ByteArray.FillArrayRandomly(c2);
 
-            var burner = new HotSegmentBurner("c",cap, 3);
+            var burner = new HotSegmentBurner(Filename, cap, 3);
             burner.Burn(new Block(c1), 1);
             burner.Burn(new Block(c2), 1);
             burner.Dispose();

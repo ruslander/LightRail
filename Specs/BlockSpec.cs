@@ -4,7 +4,7 @@ using System.Text;
 using LightRail.Core;
 using NUnit.Framework;
 
-namespace LightRail.Specs.Core
+namespace LightRail.Specs
 {
     [TestFixture]
     public class BlockSpec

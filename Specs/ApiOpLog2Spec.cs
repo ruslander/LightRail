@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using LightRail.Core;
+using LightRail.Specs.Io;
 using NUnit.Framework;
 
-namespace LightRail.Try
+namespace LightRail.Specs
 {
     class ApiOpLog2
     {
@@ -38,27 +39,12 @@ namespace LightRail.Try
     }
 
     [TestFixture]
-    public class ApiOpLog2Spec
+    public class ApiOpLog2Spec : SpecificationWithFile
     {
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-            foreach (var file in Directory.GetFiles(".", "*.sf"))
-                File.Delete(file);
-        }
-
-        private string name;
-
-        [SetUp]
-        public void Setup()
-        {
-            name = DateTime.Now.Millisecond.ToString();
-        }
-
         [Test]
         public void Append()
         {
-            var log = new Oplog2(name);
+            var log = new Oplog2(Filename);
 
             log.Append(BitConverter.GetBytes(1));
 
@@ -68,7 +54,7 @@ namespace LightRail.Try
         [Test]
         public void Forward()
         {
-            var log = new Oplog2(name);
+            var log = new Oplog2(Filename);
 
             log.Append(BitConverter.GetBytes(1));
             log.Append(BitConverter.GetBytes(2));
@@ -97,7 +83,7 @@ namespace LightRail.Try
         [Test]
         public void Backward()
         {
-            var log = new Oplog2(name);
+            var log = new Oplog2(Filename);
 
             log.Append(BitConverter.GetBytes(1));
             log.Append(BitConverter.GetBytes(2));
@@ -126,7 +112,7 @@ namespace LightRail.Try
         [Test,Ignore]
         public void Forward_a_slice()
         {
-            var log = new Oplog2(name);
+            var log = new Oplog2(Filename);
 
             log.Append(BitConverter.GetBytes(1));
             log.Append(BitConverter.GetBytes(2));
