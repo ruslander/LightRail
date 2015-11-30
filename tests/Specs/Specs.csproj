@@ -57,7 +57,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\LightRail.csproj">
+    <ProjectReference Include="..\..\src\LightRail.csproj">
       <Project>{853f48ea-2039-4816-be6b-96a74744b9f3}</Project>
       <Name>LightRail</Name>
     </ProjectReference>
