@@ -34,53 +34,25 @@ namespace Specs
 
             var initailMd5 = MD5.Create().ComputeHash(new MemoryStream(_oneByte));
 
-            writer.Write((long)8 + 16 + 1);
+            writer.Write((long)11111);
             writer.Write(initailMd5);
             writer.Write(_oneByte);
 
-            var rS = new MemoryStream(wS.ToArray());
-            var reader = new BinaryReader(rS);
+            //var rS = new MemoryStream(wS.ToArray());
+            //var reader = new BinaryReader(rS);
 
-            var op = Op.ReadFrom(reader);
+            var op = Op.ReadFrom(wS.ToArray());
 
             Assert.That(op.Hash, Is.EqualTo(initailMd5));
             Assert.That(op.Payload, Is.EqualTo(_oneByte));
-            Assert.That(op.Length, Is.EqualTo(8 + 16 + 1));
-            Assert.That(op.Position, Is.EqualTo(0));
-        }
-
-        [Test]
-        public void ReadWillRespectPosition()
-        {
-            var wS = new MemoryStream();
-            var writer = new BinaryWriter(wS);
-
-            writer.Write((long)8 + 16 + 1);
-            writer.Write(MD5.Create().ComputeHash(new MemoryStream(_oneByte)));
-            writer.Write(_oneByte);
-
-            writer.Write((long)8 + 16 + 1);
-            writer.Write(MD5.Create().ComputeHash(new MemoryStream(_oneByte)));
-            writer.Write(_oneByte);
-
-            wS.Position = 0;
-
-            var reader = new BinaryReader(wS);
-
-            var o1 = Op.ReadFrom(reader);
-            var o2 = Op.ReadFrom(reader);
-
-            Assert.That(o1.Position, Is.EqualTo(0));
-            Assert.That(o1.Length, Is.EqualTo(25));
-
-            Assert.That(o2.Position, Is.EqualTo(25));
-            Assert.That(o2.Length, Is.EqualTo(25));
+            Assert.That(op.Length, Is.EqualTo(25));
+            Assert.That(op.Position, Is.EqualTo(11111));
         }
 
         [Test]
         public void Write()
         {
-            var o = new Op(_oneByte);
+            var o = new Op(_oneByte,1);
 
             var storage = new MemoryStream();
             var writer = new BinaryWriter(storage);

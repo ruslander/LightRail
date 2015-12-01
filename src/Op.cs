@@ -10,11 +10,12 @@ namespace LightRail
         public long Length { get; private set; }
         public long Position { get; private set; }
 
-        public Op(byte[] payload)
+        public Op(byte[] payload, long position)
         {
             Payload = payload;
             Hash = GetHashFor(payload);
             Length = Payload.Length + Hash.Length + 8;
+            Position = position;
         }
 
         public Op(byte[] payload, byte[] hash, long position)
@@ -27,33 +28,32 @@ namespace LightRail
 
         public void WriteTo(BinaryWriter writer)
         {
-            writer.Write(Length);
+            writer.Write(Position);
             writer.Write(Hash);
             writer.Write(Payload);
         }
 
-        public static Op ReadFrom(BinaryReader reader)
+        public static byte[] Seal(long gp, byte[]payload)
         {
-            var localPosition = reader.BaseStream.Position;
+            var op = new Op(payload, gp);
 
-            var length = reader.ReadInt64();
-            var hash = reader.ReadBytes(16);
+            var storage = new MemoryStream();
+            var writer = new BinaryWriter(storage);
 
-            var payloadLength = length - hash.Length - 8;
-            var payload = reader.ReadBytes((int)payloadLength);
+            op.WriteTo(writer);
 
-            return new Op(payload, hash, localPosition);
+            return storage.ToArray();
         }
 
-        public static Op ReadFrom(byte[] record, long position)
+        public static Op ReadFrom(byte[] record)
         {
             var reader = new BinaryReader(new MemoryStream(record));
 
-            var length = reader.ReadInt64();
+            var position = reader.ReadInt64();
             var hash = reader.ReadBytes(16);
 
-            var payloadLength = length - hash.Length - 8;
-            var payload = reader.ReadBytes((int)payloadLength);
+            var payloadLength = record.Length - hash.Length - 8;
+            var payload = reader.ReadBytes(payloadLength);
 
             return new Op(payload, hash, position);
         }

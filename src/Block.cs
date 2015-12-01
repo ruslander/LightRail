@@ -8,7 +8,6 @@ namespace LightRail
     public class Block
     {
         public const long Size = Units.KILO*4;
-
         public readonly byte[] Payload;
 
         public Block(byte[] payload)
@@ -19,6 +18,11 @@ namespace LightRail
         public static Block New()
         {
             return new Block(new byte[Size]);
+        }
+
+        public int IndexOfNextFreeByte()
+        {
+            return Records().Sum();
         }
 
         public int Append(byte[] record)

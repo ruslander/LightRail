@@ -67,16 +67,12 @@ namespace LightRail
 
         public long Append(byte[] next)
         {
-            var op = new Op(next);
-
-            var storage = new MemoryStream();
-            var writer = new BinaryWriter(storage);
-
-            op.WriteTo(writer);
-
             try
             {
-                return BurnCurrentBlock(storage.ToArray());
+                var gp = Position + (Blocks.Count - 1) * Block.Size + _current.IndexOfNextFreeByte();
+                var sealedOp = Op.Seal(gp, next);
+
+                return BurnCurrentBlock(sealedOp);
             }
             catch (BlockFullException)
             {
@@ -85,7 +81,10 @@ namespace LightRail
 
                 RollCurrentBlock();
 
-                return BurnCurrentBlock(storage.ToArray());
+                var gp = Position + (Blocks.Count - 1) * Block.Size + _current.IndexOfNextFreeByte();
+                var sealedOp = Op.Seal(gp, next);
+
+                return BurnCurrentBlock(sealedOp);
             }
         }
 

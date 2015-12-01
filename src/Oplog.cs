@@ -92,30 +92,21 @@ namespace LightRail
         {
             var delivered = 0;
 
-            long segmentOffset = 0;
             foreach (var segment in Segments)
             {
-                var blockOffset = 0;
                 foreach (Block block in segment.FetchForward())
                 {
-                    var opOffset = 0;
-                    foreach (byte[] bytes in block.Forward())
+                    foreach (byte[] record in block.Forward())
                     {
-                        var idx = segmentOffset + blockOffset + opOffset;
+                        var op = Op.ReadFrom(record);
 
-                        if (idx >= position && delivered < sliceSize)
+                        if (op.Position >= position && delivered < sliceSize)
                         {
                             delivered++;
-                            yield return Op.ReadFrom(bytes, idx);
+                            yield return op;
                         }
-
-                        opOffset = opOffset + bytes.Length;
                     }
-
-                    blockOffset = blockOffset + block.Payload.Length;
                 }
-
-                segmentOffset = segmentOffset + _segmentCapacity;
             }
         }
 
@@ -123,29 +114,18 @@ namespace LightRail
         {
             var delivered = 0;
 
-            var segmentOffset = Segments.Count * _segmentCapacity;
             foreach (var segment in Segments.ToList().OrderByDescending(x => x.Position))
             {
-                segmentOffset = segmentOffset - _segmentCapacity;
-
-                var blockOffset = _segmentCapacity;
                 foreach (var block in segment.FetchBackward())
                 {
-                    blockOffset = blockOffset - block.Payload.Length;
-
-                    var opOffset = block.Payload.Length;
-                    var records = block.Forward().Reverse();
-
-                    foreach (var bytes in records)
+                    foreach (var record in block.Forward().Reverse())
                     {
-                        opOffset = opOffset - bytes.Length;
+                        var op = Op.ReadFrom(record);
 
-                        var idx = segmentOffset + blockOffset + opOffset;
-
-                        if (idx <= position && delivered < sliceSize)
+                        if (op.Position <= position && delivered < sliceSize)
                         {
                             delivered++;
-                            yield return Op.ReadFrom(bytes, idx);
+                            yield return op;
                         }
                     }
                 }
