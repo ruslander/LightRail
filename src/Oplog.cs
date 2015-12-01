@@ -88,8 +88,10 @@ namespace LightRail
             //Console.WriteLine("Rolling [{0}] {1}", _name, position);
         }
 
-        public IEnumerable<Op> Forward(int position = 0, int sliceSize = int.MaxValue)
+        public IEnumerable<Op> Forward(long position = 0, int sliceSize = int.MaxValue)
         {
+            var delivered = 0;
+
             long segmentOffset = 0;
             foreach (var segment in Segments)
             {
@@ -100,7 +102,12 @@ namespace LightRail
                     foreach (byte[] bytes in block.Forward())
                     {
                         var idx = segmentOffset + blockOffset + opOffset;
-                        yield return Op.ReadFrom(bytes, idx);
+
+                        if (idx >= position && delivered < sliceSize)
+                        {
+                            delivered++;
+                            yield return Op.ReadFrom(bytes, idx);
+                        }
 
                         opOffset = opOffset + bytes.Length;
                     }
@@ -112,8 +119,10 @@ namespace LightRail
             }
         }
 
-        public IEnumerable<Op> Backward()
+        public IEnumerable<Op> Backward(long position = int.MaxValue, int sliceSize = int.MaxValue)
         {
+            var delivered = 0;
+
             var segmentOffset = Segments.Count * _segmentCapacity;
             foreach (var segment in Segments.ToList().OrderByDescending(x => x.Position))
             {
@@ -131,8 +140,13 @@ namespace LightRail
                     {
                         opOffset = opOffset - bytes.Length;
 
-                        var position = segmentOffset + blockOffset + opOffset;
-                        yield return Op.ReadFrom(bytes, position);
+                        var idx = segmentOffset + blockOffset + opOffset;
+
+                        if (idx <= position && delivered < sliceSize)
+                        {
+                            delivered++;
+                            yield return Op.ReadFrom(bytes, idx);
+                        }
                     }
                 }
             }

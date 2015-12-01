@@ -107,7 +107,7 @@ namespace Specs
             Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(1));
         }
 
-        [Test,Ignore]
+        [Test]
         public void Forward_a_slice()
         {
             var log = new Oplog(Filename);
@@ -120,45 +120,61 @@ namespace Specs
 
             var items = new List<int>();
 
-            //foreach (var v in log.Forward(0, 2))
-            foreach (var v in log.Forward())
+            foreach (var v in log.Forward(idx, 2))
                 items.Add(BitConverter.ToInt32(v.Payload, 0));
 
             Assert.That(items[0], Is.EqualTo(3));
             Assert.That(items[1], Is.EqualTo(4));
 
-            Assert.That(items.Count, Is.EqualTo(3));
+            Assert.That(items.Count, Is.EqualTo(2));
         }
 
-        [Test,Ignore]
+        [Test]
         public void Forward_from_position()
         {
-            var log = new ApiOpLog2() { Items = new List<int>() { 14, 2, 34, 234, 455 } };
+            var log = new Oplog(Filename);
+            log.Append(BitConverter.GetBytes(14));
+            log.Append(BitConverter.GetBytes(2));
+            var idx = log.Append(BitConverter.GetBytes(34));
+            log.Append(BitConverter.GetBytes(234));
+            log.Append(BitConverter.GetBytes(455));
 
-            var iter = log.Forward(3).GetEnumerator(); ;
+            var iter = log.Forward(idx).GetEnumerator(); ;
 
             iter.MoveNext();
-            Assert.That(iter.Current, Is.EqualTo(234));
+            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(34));
 
             iter.MoveNext();
-            Assert.That(iter.Current, Is.EqualTo(455));
+            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(234));
+
+            iter.MoveNext();
+            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(455));
+
+            Assert.That(iter.MoveNext(), Is.False);
         }
 
-        [Test,Ignore]
+        [Test]
         public void Backward_from_position()
         {
-            var log = new ApiOpLog2() { Items = new List<int>() { 14, 2, 34, 234, 455 } };
+            var log = new Oplog(Filename);
+            log.Append(BitConverter.GetBytes(14));
+            log.Append(BitConverter.GetBytes(2));
+            var idx = log.Append(BitConverter.GetBytes(34));
+            log.Append(BitConverter.GetBytes(234));
+            log.Append(BitConverter.GetBytes(455));
 
-            var iter = log.Backward(2).GetEnumerator(); ;
+            var iter = log.Backward(idx).GetEnumerator(); ;
 
             iter.MoveNext();
-            Assert.That(iter.Current, Is.EqualTo(34));
+            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(34));
 
             iter.MoveNext();
-            Assert.That(iter.Current, Is.EqualTo(2));
-            
+            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(2));
+
             iter.MoveNext();
-            Assert.That(iter.Current, Is.EqualTo(14));
+            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(14));
+
+            Assert.That(iter.MoveNext(), Is.False);
         }
 
         [Test,Ignore]
