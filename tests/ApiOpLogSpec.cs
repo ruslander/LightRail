@@ -13,9 +13,19 @@ namespace Specs
         {
             var log = new Oplog(Filename);
 
-            log.Append(BitConverter.GetBytes(1));
+            log.Append(ToBytes(1));
 
             Assert.That(log.CurrentSegment.RecordsCount(), Is.EqualTo(1));
+        }
+
+        public byte[] ToBytes(int value)
+        {
+            return BitConverter.GetBytes(value);
+        }
+
+        public int ToInt(byte[] value)
+        {
+            return BitConverter.ToInt32(value, 0);
         }
 
         [Test]
@@ -23,28 +33,28 @@ namespace Specs
         {
             var log = new Oplog(Filename);
 
-            log.Append(BitConverter.GetBytes(1));
-            log.Append(BitConverter.GetBytes(2));
-            log.Append(BitConverter.GetBytes(3));
-            log.Append(BitConverter.GetBytes(4));
-            log.Append(BitConverter.GetBytes(5));
+            log.Append(ToBytes(1));
+            log.Append(ToBytes(2));
+            log.Append(ToBytes(3));
+            log.Append(ToBytes(4));
+            log.Append(ToBytes(5));
 
             var iter = log.Forward().GetEnumerator();
             
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(1));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(1));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(2));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(2));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(3));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(3));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(4));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(4));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(5));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(5));
         }
 
         [Test]
@@ -52,28 +62,28 @@ namespace Specs
         {
             var log = new Oplog(Filename);
 
-            log.Append(BitConverter.GetBytes(1));
-            log.Append(BitConverter.GetBytes(2));
-            log.Append(BitConverter.GetBytes(3));
-            log.Append(BitConverter.GetBytes(4));
-            log.Append(BitConverter.GetBytes(5));
+            log.Append(ToBytes(1));
+            log.Append(ToBytes(2));
+            log.Append(ToBytes(3));
+            log.Append(ToBytes(4));
+            log.Append(ToBytes(5));
 
             var iter = log.Backward().GetEnumerator(); ;
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(5));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(5));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(4));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(4));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(3));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(3));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(2));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(2));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(1));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(1));
         }
 
         [Test]
@@ -81,11 +91,11 @@ namespace Specs
         {
             var log = new Oplog(Filename);
 
-            log.Append(BitConverter.GetBytes(1));
-            log.Append(BitConverter.GetBytes(2));
-            var idx = log.Append(BitConverter.GetBytes(3));
-            log.Append(BitConverter.GetBytes(4));
-            log.Append(BitConverter.GetBytes(5));
+            log.Append(ToBytes(1));
+            log.Append(ToBytes(2));
+            var idx = log.Append(ToBytes(3));
+            log.Append(ToBytes(4));
+            log.Append(ToBytes(5));
 
             var items = new List<int>();
 
@@ -102,22 +112,22 @@ namespace Specs
         public void Forward_from_position()
         {
             var log = new Oplog(Filename);
-            log.Append(BitConverter.GetBytes(14));
-            log.Append(BitConverter.GetBytes(2));
-            var idx = log.Append(BitConverter.GetBytes(34));
-            log.Append(BitConverter.GetBytes(234));
-            log.Append(BitConverter.GetBytes(455));
+            log.Append(ToBytes(14));
+            log.Append(ToBytes(2));
+            var idx = log.Append(ToBytes(34));
+            log.Append(ToBytes(234));
+            log.Append(ToBytes(455));
 
             var iter = log.Forward(idx).GetEnumerator(); ;
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(34));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(34));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(234));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(234));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(455));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(455));
 
             Assert.That(iter.MoveNext(), Is.False);
         }
@@ -126,22 +136,22 @@ namespace Specs
         public void Backward_from_position()
         {
             var log = new Oplog(Filename);
-            log.Append(BitConverter.GetBytes(14));
-            log.Append(BitConverter.GetBytes(2));
-            var idx = log.Append(BitConverter.GetBytes(34));
-            log.Append(BitConverter.GetBytes(234));
-            log.Append(BitConverter.GetBytes(455));
+            log.Append(ToBytes(14));
+            log.Append(ToBytes(2));
+            var idx = log.Append(ToBytes(34));
+            log.Append(ToBytes(234));
+            log.Append(ToBytes(455));
 
             var iter = log.Backward(idx).GetEnumerator(); ;
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(34));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(34));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(2));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(2));
 
             iter.MoveNext();
-            Assert.That(BitConverter.ToInt32(iter.Current.Payload, 0), Is.EqualTo(14));
+            Assert.That(ToInt(iter.Current.Payload), Is.EqualTo(14));
 
             Assert.That(iter.MoveNext(), Is.False);
         }
@@ -151,11 +161,11 @@ namespace Specs
         {
             var log = new Oplog(Filename);
 
-            log.Append(BitConverter.GetBytes(1));
-            log.Append(BitConverter.GetBytes(2));
-            log.Append(BitConverter.GetBytes(3));
-            log.Append(BitConverter.GetBytes(4));
-            log.Append(BitConverter.GetBytes(5));
+            log.Append(ToBytes(1));
+            log.Append(ToBytes(2));
+            log.Append(ToBytes(3));
+            log.Append(ToBytes(4));
+            log.Append(ToBytes(5));
 
             var items = new List<int>();
 
