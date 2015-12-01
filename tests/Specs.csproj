@@ -45,6 +45,7 @@
     <Compile Include="ApiOpLogSpec.cs" />
     <Compile Include="BlockSpec.cs" />
     <Compile Include="ByteArray.cs" />
+    <Compile Include="EnvironmentSetup.cs" />
     <Compile Include="HotSegmentSpec.cs" />
     <Compile Include="OplogEndToEndSpec.cs" />
     <Compile Include="OplogSpec.cs" />

@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using LightRail;
@@ -11,14 +10,7 @@ namespace Specs
     [TestFixture]
     public class OplogEndToEndSpec
     {
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-            foreach (var file in Directory.GetFiles(".", "*.sf"))
-                File.Delete(file);
-        }
-
-        [Test,Ignore]
+        [Test]
         public void append_1_mln()
         {
             const int ops = 1000000;
@@ -39,6 +31,7 @@ namespace Specs
             var reads = rl.Forward().Count();
             rlWatch.Stop();
 
+            Console.WriteLine("");
 
             Console.WriteLine("Writes            : " + ops);
             Console.WriteLine("Write Timespan    : " + TimeSpan.FromMilliseconds(wlWatch.ElapsedMilliseconds));
