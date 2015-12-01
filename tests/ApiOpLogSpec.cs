@@ -177,5 +177,37 @@ namespace Specs
 
             Assert.That(items.Count, Is.EqualTo(2));
         }
+
+        [Test]
+        public void Head()
+        {
+            var log = new Oplog(Filename);
+
+            log.Append(ToBytes(1));
+            log.Append(ToBytes(2));
+            log.Append(ToBytes(3));
+            log.Append(ToBytes(4));
+            log.Append(ToBytes(5));
+
+            var v = log.Head();
+
+            Assert.That(BitConverter.ToInt32(v.Payload, 0), Is.EqualTo(5));
+        }
+
+        [Test]
+        public void Tail()
+        {
+            var log = new Oplog(Filename);
+
+            log.Append(ToBytes(1));
+            log.Append(ToBytes(2));
+            log.Append(ToBytes(3));
+            log.Append(ToBytes(4));
+            log.Append(ToBytes(5));
+
+            var v = log.Tail();
+
+            Assert.That(BitConverter.ToInt32(v.Payload, 0), Is.EqualTo(1));
+        }
     }
 }

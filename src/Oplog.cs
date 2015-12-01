@@ -137,5 +137,25 @@ namespace LightRail
             if (CurrentSegment != null)
                 CurrentSegment.Burner.Dispose();
         }
+
+        // max
+        public Op Head()
+        {
+            var sg = Segments.ToList().OrderByDescending(x => x.Position).First();
+            var block = sg.FetchBackward().First();
+            var record = block.Forward().Reverse().First();
+
+            return Op.ReadFrom(record);
+        }
+
+        // 0
+        public Op Tail()
+        {
+            var sg = Segments.First();
+            var block = sg.FetchForward().First();
+            var record = block.Forward().First();
+
+            return Op.ReadFrom(record);
+        }
     }
 }
