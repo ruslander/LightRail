@@ -8,7 +8,6 @@ used in databases to keep the transaction log.
 Why would I use it  
 Guarantees  
 Moving parts  
-Storage layout  
 Performance
 
 ## Usage
@@ -17,6 +16,52 @@ api surface
 - append     
 - iterate forward/backward  
 - top/head
+
+##Storage layout  
+
+```
+Log format
+
+	tail                                                     head 
+	+---------------------------------------------+---- ... ----+
+	|   f000000000000.sf   |   f000004194304.sf   |
+	+---------------------------------------------+---- ... ----+
+	<------ 4mb block ---->|<--- 4mb block ------->
+
+	head = the active file which accepts append operations
+	tail = will normaly be readonly files
+	f000004194304.sf = represents next the 4mb of logs
+   
+File format
+
+	+-----+-------------+--+----+----------+------+-- ... ----+
+	| r0  |        r1   |P | r2 |    r3    |  r4  |           |
+	+-----+-------------+--+----+----------+------+-- ... ----+
+	<--- 4k block   ------>|<--   4k block ------>|
+
+	rn = variable size records
+	P = Padding
+
+Block format
+
+	+-----+-------+-----+----------+------+-- ... ----+----+----+
+	| r0  |  r1   |  r2 |    r3    |  r4  |        s2 | s1 | s0 |
+	+-----+-------+-----+----------+------+-- ... ----+----+----+
+	|<--- 4k block   ------------------------------------------>|
+
+	rn = records
+	sn = record sizes
+
+Record format
+
+	+----------+------------+------------+--- ... ---+
+	| Pos (8B) | Hash (16B) |  Payload   |
+	+----------+------------+------------+--- ... ---+
+
+	Pos = global record position in the stream
+	Hash = 32B hash computed over the payload using MD5
+	Payload = Byte stream as long as specified by the header size
+```
 
 ## Contributing
 
