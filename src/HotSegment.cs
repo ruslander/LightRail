@@ -48,21 +48,21 @@ namespace LightRail
 
         Block _current;
 
+        public HotSegment(long capacity) : this(capacity, new List<Block>()) { }
+
         public HotSegment(long capacity, List<Block> blocks)
         {
             _capacity = capacity;
 
             Blocks = blocks;
-            _current = blocks.Last();
-        }
 
-        public HotSegment(long capacity)
-        {
-            _capacity = capacity;
-            
-            Blocks = new List<Block>();
-
-            RollCurrentBlock();
+            if (blocks.Count > 0)
+                _current = blocks.Last();
+            else
+            {
+                _current = Block.New();
+                Blocks.Add(_current);
+            }
         }
 
         public long Append(byte[] next)

@@ -38,11 +38,7 @@ namespace LightRail
                 Segments.Remove(last);
 
                 var burner = new HotSegmentBurner(_name, _quota, last.Position);
-
-                if (blocks.Count == 0)
-                    CurrentSegment = new HotSegment(_quota) {Burner = burner, Position = last.Position};
-                else
-                    CurrentSegment = new HotSegment(_quota, blocks){ Burner = burner, Position = last.Position };
+                CurrentSegment = new HotSegment(_quota, blocks) { Burner = burner, Position = last.Position };
 
                 Segments.Add(CurrentSegment);
             }
