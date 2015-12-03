@@ -146,5 +146,31 @@ namespace Specs
             Assert.That(rd.CurrentSegment.Blocks.Count, Is.EqualTo(2));
             Assert.That(rd.CurrentSegment.Blocks.Select(x => x.Records().Count).Sum(), Is.EqualTo(100));
         }
+
+        [Test]
+        public void ReopenEmptyLog()
+        {
+            var wr = new Oplog(Filename);
+            wr.Dispose();
+
+            var rd = new Oplog(Filename);
+            var ops = rd.Forward().ToList();
+
+            Assert.That(ops.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void HeadEmptyLog()
+        {
+            var wr = new Oplog(Filename);
+            Assert.That(wr.Head(), Is.Null);
+        }
+
+        [Test]
+        public void TailEmptyLog()
+        {
+            var wr = new Oplog(Filename);
+            Assert.That(wr.Tail(), Is.Null);
+        }
     }
 }

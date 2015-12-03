@@ -10,7 +10,7 @@ namespace Specs
     [TestFixture]
     public class OplogEndToEndSpec
     {
-        [Test]
+        [Test,Ignore]
         public void append_1_mln()
         {
             const int ops = 1000000;

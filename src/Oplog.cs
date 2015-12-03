@@ -8,23 +8,21 @@ namespace LightRail
     public class Oplog : IDisposable
     {
         private readonly string _name;
-        private readonly long _segmentCapacity;
+        private readonly long _quota;
 
         public readonly List<ISegment> Segments;
         public HotSegment CurrentSegment;
 
-        public Oplog(string name, long segmentCapacity)
+        public Oplog(string name, long quota)
         {
             _name = name;
-            _segmentCapacity = segmentCapacity;
+            _quota = quota;
 
             Segments = Directory
                 .GetFiles(".", string.Format("{0}*.sf", _name))
                 .Select(x => ColdSegment.Load(x, _name))
                 .OrderBy(x => x.Position)
                 .ToList();
-
-            //Console.WriteLine("Detected [{0}] {1}",name, Segments.Count);
 
             if(!Segments.Any())
                 RollNewSegment();
@@ -39,11 +37,12 @@ namespace LightRail
 
                 Segments.Remove(last);
 
-                CurrentSegment = new HotSegment(_segmentCapacity, blocks)
-                {
-                    Burner = new HotSegmentBurner(_name, _segmentCapacity, last.Position),
-                    Position = last.Position
-                };
+                var burner = new HotSegmentBurner(_name, _quota, last.Position);
+
+                if (blocks.Count == 0)
+                    CurrentSegment = new HotSegment(_quota) {Burner = burner, Position = last.Position};
+                else
+                    CurrentSegment = new HotSegment(_quota, blocks){ Burner = burner, Position = last.Position };
 
                 Segments.Add(CurrentSegment);
             }
@@ -67,7 +66,7 @@ namespace LightRail
                 current = CurrentSegment.Append(content);
             }
 
-            return current + (Segments.Count - 1) * _segmentCapacity;
+            return current + (Segments.Count - 1) * _quota;
         }
 
         private void RollNewSegment()
@@ -75,17 +74,15 @@ namespace LightRail
             if (CurrentSegment != null)
                 CurrentSegment.Burner.Dispose();
 
-            var position = Segments.Count * _segmentCapacity;
+            var position = Segments.Count * _quota;
 
-            CurrentSegment = new HotSegment(_segmentCapacity)
+            CurrentSegment = new HotSegment(_quota)
             {
-                Burner = new HotSegmentBurner(_name, _segmentCapacity, position),
+                Burner = new HotSegmentBurner(_name, _quota, position),
                 Position = position
             };
 
             Segments.Add(CurrentSegment);
-
-            //Console.WriteLine("Rolling [{0}] {1}", _name, position);
         }
 
         public IEnumerable<Op> Forward(long position = 0, int sliceSize = int.MaxValue)
@@ -132,30 +129,34 @@ namespace LightRail
             }
         }
 
-        public void Dispose()
-        {
-            if (CurrentSegment != null)
-                CurrentSegment.Burner.Dispose();
-        }
-
-        // max
         public Op Head()
         {
             var sg = Segments.ToList().OrderByDescending(x => x.Position).First();
             var block = sg.FetchBackward().First();
-            var record = block.Forward().Reverse().First();
+            var record = block.Forward().Reverse().FirstOrDefault();
+
+            if (record == null)
+                return null;
 
             return Op.ReadFrom(record);
         }
 
-        // 0
         public Op Tail()
         {
             var sg = Segments.First();
             var block = sg.FetchForward().First();
-            var record = block.Forward().First();
+            var record = block.Forward().FirstOrDefault();
+
+            if (record == null)
+                return null;
 
             return Op.ReadFrom(record);
+        }
+
+        public void Dispose()
+        {
+            if (CurrentSegment != null)
+                CurrentSegment.Burner.Dispose();
         }
     }
 }
