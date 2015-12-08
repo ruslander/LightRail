@@ -9,15 +9,13 @@ namespace Specs
     [TestFixture]
     public class OplogBurnerSpec : SpecificationWithFile
     {
-        private int cap = 100;
-
         [Test]
         public void BurnTest()
         {
             var c1 = new byte[20];
             ByteArray.FillArrayRandomly(c1);
 
-            var burner = new HotSegmentBurner(Filename, cap, 1);
+            var burner = new HotSegmentBurner(QuotedAs(100), 1);
             burner.Burn(new Block(c1), 1);
             burner.Dispose();
 
@@ -35,7 +33,7 @@ namespace Specs
             var c2 = new byte[20];
             ByteArray.FillArrayRandomly(c2);
 
-            var burner = new HotSegmentBurner(Filename, cap, 2);
+            var burner = new HotSegmentBurner(QuotedAs(100), 2);
             burner.Burn(new Block(c1), 1);
             burner.Burn(new Block(c2), 2);
             burner.Dispose();
@@ -55,7 +53,7 @@ namespace Specs
             var c2 = new byte[20];
             ByteArray.FillArrayRandomly(c2);
 
-            var burner = new HotSegmentBurner(Filename, cap, 3);
+            var burner = new HotSegmentBurner(QuotedAs(100), 3);
             burner.Burn(new Block(c1), 1);
             burner.Burn(new Block(c2), 1);
             burner.Dispose();

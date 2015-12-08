@@ -9,7 +9,10 @@ namespace Specs
         [SetUp]
         public void RunBeforeAnyTests()
         {
-            foreach (var file in Directory.GetFiles(".", "*.sf"))
+            if (!Directory.Exists("utt"))
+                Directory.CreateDirectory("utt");
+
+            foreach (var file in Directory.GetFiles("utt", "*.sf"))
                 File.Delete(file);
         }
 

@@ -8,9 +8,9 @@ namespace LightRail
         readonly FileStream _fsSegment;
         public string Path;
 
-        public HotSegmentBurner(string name, long capacity, long position)
+        public HotSegmentBurner(OplogConfig cfg, long position)
         {
-            Path = string.Format("{0}{1}.sf", name, position.ToString("D12"));;
+            Path = System.IO.Path.Combine(cfg.BasePath, string.Format("{0}{1}.sf", cfg.Name, position.ToString("D12")));
 
             _fsSegment = new FileStream(
                 Path, 
@@ -20,7 +20,8 @@ namespace LightRail
                 4096, 
                 FileOptions.WriteThrough);
 
-            _fsSegment.SetLength(capacity);
+            if(cfg.Fixed)
+                _fsSegment.SetLength(cfg.Quota);
         }
 
         public void Burn(Block current, int count)

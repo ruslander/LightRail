@@ -13,10 +13,10 @@ namespace Specs
          [Test]
          public void AppendTest()
          {
-             var log = new Oplog(Filename);
+             var log = new Oplog(Cfg4Mb);
              log.Append(Guid.NewGuid().ToByteArray());
 
-             Assert.That(File.Exists(Filename+"000000000000.sf"), Is.True);
+             Assert.That(FileExists("000000000000.sf"), Is.True);
 
              Assert.That(log.Segments.Count, Is.EqualTo(1));
              Assert.That(log.Segments[0].FetchForward().Count(), Is.EqualTo(1));
@@ -25,17 +25,17 @@ namespace Specs
          [Test]
          public void MultiAppendReadCountsTest()
          {
-             var wr = new Oplog(Filename, 4 * Units.KILO);
+             var wr = new Oplog(Cfg4K);
 
              for (int i = 0; i < 100; i++)
                  wr.Append(Guid.NewGuid().ToByteArray());
 
              wr.Dispose();
 
-             Assert.That(File.Exists(Filename + "000000000000.sf"), Is.True);
-             Assert.That(File.Exists(Filename + "000000004096.sf"), Is.True);
+             Assert.That(FileExists("000000000000.sf"), Is.True);
+             Assert.That(FileExists("000000004096.sf"), Is.True);
 
-             var rd = new Oplog(Filename, 100 * Units.KILO);
+             var rd = new Oplog(Cfg4K);
              var ops = rd.Forward().ToList();
 
              foreach (var op in ops)
@@ -47,14 +47,14 @@ namespace Specs
         [Test]
          public void ReopenLastSegmentTest()
          {
-             var wr = new Oplog(Filename, 4 * Units.KILO);
+             var wr = new Oplog(Cfg4K);
 
              for (int i = 0; i < 100; i++)
                  wr.Append(Guid.NewGuid().ToByteArray());
 
              wr.Dispose();
 
-             var rd = new Oplog(Filename, 4 * Units.KILO);
+             var rd = new Oplog(Cfg4K);
                 rd.Append(Guid.NewGuid().ToByteArray());
              
              Assert.That(rd.CurrentSegment.Position, Is.EqualTo(4096));
@@ -74,14 +74,14 @@ namespace Specs
         [Test]
          public void ListForwardTest()
          {
-             var wr = new Oplog(Filename, 4 * Units.KILO);
+             var wr = new Oplog(Cfg4K);
 
              for (int i = 0; i < 100; i++)
                  wr.Append(Guid.NewGuid().ToByteArray());
 
              wr.Dispose();
 
-             var rd = new Oplog(Filename, 4 * Units.KILO);
+             var rd = new Oplog(Cfg4K);
 
              long prev = -1;
 
@@ -98,14 +98,14 @@ namespace Specs
         [Test]
          public void ListBackwardTest()
          {
-             var wr = new Oplog(Filename, 4 * Units.KILO);
+             var wr = new Oplog(Cfg4K);
 
              for (int i = 0; i < 100; i++)
                  wr.Append(BitConverter.GetBytes(i));
 
              wr.Dispose();
 
-             var rd = new Oplog(Filename, 4 * Units.KILO);
+             var rd = new Oplog(Cfg4K);
 
              long prev = long.MaxValue;
 
@@ -124,7 +124,7 @@ namespace Specs
         [Test]
         public void DefaultSizeMultiAppendReadCountsTest()
         {
-            var wr = new Oplog(Filename);
+            var wr = new Oplog(Cfg4Mb);
 
             for (int i = 0; i < 100; i++)
                 wr.Append(Guid.NewGuid().ToByteArray());
@@ -136,7 +136,7 @@ namespace Specs
             Assert.That(wr.CurrentSegment.Blocks.Select(x => x.Records().Count).Sum(), Is.EqualTo(100));
 
 
-            var rd = new Oplog(Filename);
+            var rd = new Oplog(Cfg4Mb);
             var ops = rd.Forward().ToList();
 
             foreach (var op in ops)
@@ -150,10 +150,10 @@ namespace Specs
         [Test]
         public void ReopenEmptyLog()
         {
-            var wr = new Oplog(Filename);
+            var wr = new Oplog(Cfg4K);
             wr.Dispose();
 
-            var rd = new Oplog(Filename);
+            var rd = new Oplog(Cfg4K);
             var ops = rd.Forward().ToList();
 
             Assert.That(ops.Count, Is.EqualTo(0));
@@ -162,14 +162,14 @@ namespace Specs
         [Test]
         public void HeadEmptyLog()
         {
-            var wr = new Oplog(Filename);
+            var wr = new Oplog(Cfg4K);
             Assert.That(wr.Head(), Is.Null);
         }
 
         [Test]
         public void TailEmptyLog()
         {
-            var wr = new Oplog(Filename);
+            var wr = new Oplog(Cfg4K);
             Assert.That(wr.Tail(), Is.Null);
         }
     }

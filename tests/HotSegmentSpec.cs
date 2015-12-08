@@ -13,8 +13,8 @@ namespace Specs
         {
             var activeSegment = new HotSegment(45 * Units.MEGA)
             {
-                Burner = new HotSegmentBurner(Filename, 45 * Units.MEGA, 0),
-            }; 
+                Burner = new HotSegmentBurner(QuotedAs(45 * Units.MEGA), 0),
+            };
 
             for (var i = 0; i < 10 * 100; i++)
             {
@@ -32,7 +32,7 @@ namespace Specs
         {
             var activeSegment = new HotSegment(10 * Units.KILO)
             {
-                Burner = new HotSegmentBurner(Filename, 10 * Units.KILO, 0),
+                Burner = new HotSegmentBurner(QuotedAs(10 * Units.KILO), 0),
             }; ;
 
             try
