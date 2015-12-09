@@ -16,7 +16,7 @@ namespace Specs
             const int ops = 1000000;
             //const int ops = 100;
 
-            var wl = new Oplog("a");
+            var wl = new OpDataPersister("a");
             var wlWatch = Stopwatch.StartNew();
 
             for (int i = 0; i < ops; i++)
@@ -25,7 +25,7 @@ namespace Specs
             wlWatch.Stop();
             wl.Dispose();
 
-            var rl = new Oplog("a");
+            var rl = new OpDataPersister("a");
 
             var rlWatch = Stopwatch.StartNew();
             var reads = rl.Forward().Count();

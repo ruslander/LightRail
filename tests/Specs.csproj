@@ -42,15 +42,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiOpLogSpec.cs" />
+    <Compile Include="OpDataPersister2Spec.cs" />
     <Compile Include="BlockSpec.cs" />
     <Compile Include="ByteArray.cs" />
     <Compile Include="EnvironmentSetup.cs" />
     <Compile Include="HotSegmentSpec.cs" />
-    <Compile Include="OplogEndToEndSpec.cs" />
     <Compile Include="OplogSpec.cs" />
+    <Compile Include="OplogEndToEndSpec.cs" />
+    <Compile Include="OpDataPersisterSpec.cs" />
     <Compile Include="OplogBurnerSpec.cs" />
-    <Compile Include="OpSpec.cs" />
+    <Compile Include="OpDataSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpecificationWithFile.cs" />
   </ItemGroup>

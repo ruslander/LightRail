@@ -6,12 +6,12 @@ using NUnit.Framework;
 namespace Specs
 {
     [TestFixture]
-    public class ApiOpLogSpec : SpecificationWithFile
+    public class OpDataPersister2Spec : SpecificationWithFile
     {
         [Test]
         public void Append()
         {
-            var log = new Oplog(Cfg4Mb);
+            var log = new OpDataPersister(Cfg4Mb);
 
             log.Append(ToBytes(1));
 
@@ -31,7 +31,7 @@ namespace Specs
         [Test]
         public void Forward()
         {
-            var log = new Oplog(Cfg4Mb);
+            var log = new OpDataPersister(Cfg4Mb);
 
             log.Append(ToBytes(1));
             log.Append(ToBytes(2));
@@ -60,7 +60,7 @@ namespace Specs
         [Test]
         public void Backward()
         {
-            var log = new Oplog(Cfg4Mb);
+            var log = new OpDataPersister(Cfg4Mb);
 
             log.Append(ToBytes(1));
             log.Append(ToBytes(2));
@@ -89,7 +89,7 @@ namespace Specs
         [Test]
         public void Forward_a_slice()
         {
-            var log = new Oplog(Cfg4Mb);
+            var log = new OpDataPersister(Cfg4Mb);
 
             log.Append(ToBytes(1));
             log.Append(ToBytes(2));
@@ -111,7 +111,7 @@ namespace Specs
         [Test]
         public void Forward_from_position()
         {
-            var log = new Oplog(Cfg4Mb);
+            var log = new OpDataPersister(Cfg4Mb);
             log.Append(ToBytes(14));
             log.Append(ToBytes(2));
             var idx = log.Append(ToBytes(34));
@@ -135,7 +135,7 @@ namespace Specs
         [Test]
         public void Backward_from_position()
         {
-            var log = new Oplog(Cfg4Mb);
+            var log = new OpDataPersister(Cfg4Mb);
             log.Append(ToBytes(14));
             log.Append(ToBytes(2));
             var idx = log.Append(ToBytes(34));
@@ -159,7 +159,7 @@ namespace Specs
         [Test]
         public void Backward_a_slice()
         {
-            var log = new Oplog(Cfg4Mb);
+            var log = new OpDataPersister(Cfg4Mb);
 
             log.Append(ToBytes(1));
             log.Append(ToBytes(2));
@@ -181,7 +181,7 @@ namespace Specs
         [Test]
         public void Head()
         {
-            var log = new Oplog(Cfg4Mb);
+            var log = new OpDataPersister(Cfg4Mb);
 
             log.Append(ToBytes(1));
             log.Append(ToBytes(2));
@@ -197,7 +197,7 @@ namespace Specs
         [Test]
         public void Tail()
         {
-            var log = new Oplog(Cfg4Mb);
+            var log = new OpDataPersister(Cfg4Mb);
 
             log.Append(ToBytes(1));
             log.Append(ToBytes(2));

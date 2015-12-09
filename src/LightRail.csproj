@@ -44,8 +44,11 @@
     <Compile Include="ColdSegment.cs" />
     <Compile Include="HotSegment.cs" />
     <Compile Include="HotSegmentBurner.cs" />
-    <Compile Include="Oplog.cs" />
     <Compile Include="Op.cs" />
+    <Compile Include="OpDataPersister.cs" />
+    <Compile Include="OpData.cs" />
+    <Compile Include="Oplog.cs" />
+    <Compile Include="OplogConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Units.cs" />
   </ItemGroup>

@@ -14,7 +14,7 @@ namespace Specs
      */
 
     [TestFixture]
-    public class OpSpec
+    public class OpDataSpec
     {
         readonly byte[] _empty = new byte[] { };
         readonly byte[] _oneByte = new byte[] { 1 };
@@ -41,7 +41,7 @@ namespace Specs
             //var rS = new MemoryStream(wS.ToArray());
             //var reader = new BinaryReader(rS);
 
-            var op = Op.ReadFrom(wS.ToArray());
+            var op = OpData.ReadFrom(wS.ToArray());
 
             Assert.That(op.Hash, Is.EqualTo(initailMd5));
             Assert.That(op.Payload, Is.EqualTo(_oneByte));
@@ -52,7 +52,7 @@ namespace Specs
         [Test]
         public void Write()
         {
-            var o = new Op(_oneByte,1);
+            var o = new OpData(_oneByte,1);
 
             var storage = new MemoryStream();
             var writer = new BinaryWriter(storage);

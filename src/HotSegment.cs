@@ -70,7 +70,7 @@ namespace LightRail
             try
             {
                 var gp = Position + (Blocks.Count - 1) * Block.Size + _current.IndexOfNextFreeByte();
-                var sealedOp = Op.Seal(gp, next);
+                var sealedOp = OpData.Seal(gp, next);
 
                 return BurnCurrentBlock(sealedOp);
             }
@@ -82,7 +82,7 @@ namespace LightRail
                 RollCurrentBlock();
 
                 var gp = Position + (Blocks.Count - 1) * Block.Size + _current.IndexOfNextFreeByte();
-                var sealedOp = Op.Seal(gp, next);
+                var sealedOp = OpData.Seal(gp, next);
 
                 return BurnCurrentBlock(sealedOp);
             }
