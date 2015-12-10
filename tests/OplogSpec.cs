@@ -37,10 +37,7 @@ namespace Specs
             var op = lw.Head();
             lr.Dispose();
 
-
             Assert.That(op.Body, Is.EqualTo(333));
         }
     }
-
-    
 }
