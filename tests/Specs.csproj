@@ -54,8 +54,9 @@
     <Compile Include="OpDataPersisterSpec.cs" />
     <Compile Include="OplogBurnerSpec.cs" />
     <Compile Include="OpDataSpec.cs" />
-    <Compile Include="Proc\FailRecoverySpec.cs" />
-    <Compile Include="Proc\FailRecoverySpec2.cs" />
+    <Compile Include="Proc\FailRecoveryFsm.cs" />
+    <Compile Include="Proc\FeaturesRegistryFsmSpec.cs" />
+    <Compile Include="Proc\FeaturesRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpecificationWithFile.cs" />
   </ItemGroup>

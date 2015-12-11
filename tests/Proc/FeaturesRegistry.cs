@@ -1,72 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightRail;
-using NUnit.Framework;
 
 namespace Specs.Proc
 {
-    [TestFixture]
-    public class FailRecoverySpec2 : SpecificationWithFile
-    {
-        [Test]
-        public void Oplog()
-        {
-            var lw = new Oplog(Cfg4K);
-            lw.Append(new Op() { Body = 333 });
-            lw.Dispose();
-
-            var lr = new Oplog(Cfg4K);
-            var op = lw.Head();
-            lr.Dispose();
-
-            Assert.That(op.Body, Is.EqualTo(333));
-        }
-    }
-
-    public class FailRecoveryProcessLog
-    {
-        public int Version = 0;
-        public List<object> Changes = new List<object>();
-
-        public void Apply(object evt)
-        {
-            Version++;
-            Changes.Add(evt);
-
-            ((dynamic)this).When((dynamic)evt);
-        }
-
-        public void Dispatch(object cmd)
-        {
-            ((dynamic)this).Handle((dynamic)cmd);
-        }
-
-        public List<object> Delta(int fromV)
-        {
-            return Changes.Skip(fromV).ToList();
-        }
-
-        public void LoadsFromHistory(IEnumerable<Event> history)
-        {
-            foreach (var e in history) 
-                ((dynamic)this).When((dynamic)e);
-        }
-    }
-
-    public class DistributedFeaturesRegistry : FailRecoveryProcessLog
+    public class FeaturesRegistry : FailRecoveryFsm
     {
         private readonly Dictionary<string, FeatureState> _features = new Dictionary<string, FeatureState>();
 
         public void Handle(AddFeatureCommand cmd)
         {
-            if (_features.Any(@switch => cmd.Name == @switch.Value.Name))
+            if (_features.Any(@switch => cmd.Id == @switch.Key))
                 return;
 
             Apply(new FeatureAdded()
             {
                 Id = cmd.Id,
-                Name = cmd.Name,
                 Enabled = cmd.Enabled
             });
         }
@@ -84,7 +33,6 @@ namespace Specs.Proc
             _features.Add(addedEvt.Id, new FeatureState()
             {
                 Enabled = addedEvt.Enabled,
-                Name = addedEvt.Name
             });
         }
 
@@ -95,7 +43,7 @@ namespace Specs.Proc
 
         public bool Get(string key)
         {
-            return _features.Single(@switch => key == @switch.Value.Name).Value.Enabled;
+            return _features[key].Enabled;
         }
 
         public IEnumerable<Feature> All()
@@ -104,7 +52,6 @@ namespace Specs.Proc
             {
                 Id = @switch.Key,
                 Enabled = @switch.Value.Enabled,
-                Name = @switch.Value.Name
             });
         }
     }
@@ -112,20 +59,17 @@ namespace Specs.Proc
     public class Feature
     {
         public string Id { get; set; }
-        public string Name { get; set; }
         public bool Enabled { get; set; }
     }
 
     public class FeatureState
     {
-        public string Name { get; set; }
         public bool Enabled { get; set; }
     }
 
     [Serializable]
     public class AddFeatureCommand
     {
-        public string Name { get; set; }
         public bool Enabled { get; set; }
         public string Id { get; set; }
     }
@@ -145,7 +89,6 @@ namespace Specs.Proc
     [Serializable]
     public class FeatureAdded
     {
-        public string Name { get; set; }
         public bool Enabled { get; set; }
         public string Id { get; set; }
     }
