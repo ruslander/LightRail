@@ -1,7 +1,7 @@
 using System.IO;
 using System.Linq;
-using LightRail;
-using LightRail.Specs.Io;
+using StableStorage;
+using StableStorage.Specs.Io;
 using NUnit.Framework;
 
 namespace Specs

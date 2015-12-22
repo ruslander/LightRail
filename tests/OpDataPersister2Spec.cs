@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LightRail;
+using StableStorage;
 using NUnit.Framework;
 
 namespace Specs

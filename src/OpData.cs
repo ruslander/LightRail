@@ -1,7 +1,7 @@
 using System.IO;
 using System.Security.Cryptography;
 
-namespace LightRail
+namespace StableStorage
 {
     public class OpData
     {

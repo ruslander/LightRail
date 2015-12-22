@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LightRail
+namespace StableStorage
 {
     public class BlockFullException : Exception { }
     public class Block

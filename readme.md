@@ -1,4 +1,4 @@
-# Light Rail
+# Stable storage
 
 The code here implements a persistent, append-only data structure.  It is similar to write ahead log (WAL)  
 used in databases to keep the transaction log.
@@ -59,7 +59,7 @@ Record format
 	+----------+------------+------------+--- ... ---+
 
 	Pos = global record position in the stream
-	Hash = 32B hash computed over the payload using MD5
+	Hash = 16B hash computed over the payload using MD5
 	Payload = Byte stream as long as specified by the header size
 ```
 
@@ -79,6 +79,7 @@ crash-recovery process abstraction.
 ## Credits
 
 - lmdb
+- leveldb https://leveldb.googlecode.com/svn/trunk/doc/log_format.txt
 - eventstore
 - kafka
 - rocksdb    

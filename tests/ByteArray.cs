@@ -1,6 +1,6 @@
 using System;
 
-namespace LightRail.Specs.Io
+namespace StableStorage.Specs.Io
 {
     class ByteArray
     {

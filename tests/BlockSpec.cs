@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using LightRail;
+using StableStorage;
 using NUnit.Framework;
 
 namespace Specs
@@ -102,14 +102,17 @@ namespace Specs
             Assert.That(block.Append(BitConverter.GetBytes(2222)), Is.EqualTo(4));
         }
 
-        [Test,ExpectedException(typeof(BlockFullException))]
+        [Test]
         public void BlockFullException_when_full()
         {
             var layout = new byte[10];
             var block = new Block(layout);
 
-            block.Append(BitConverter.GetBytes(1111));
-            block.Append(BitConverter.GetBytes(7777));
+            Assert.Throws<BlockFullException>(() =>
+            {
+                block.Append(BitConverter.GetBytes(1111));
+                block.Append(BitConverter.GetBytes(7777));
+            });
         }
 
         [Test]

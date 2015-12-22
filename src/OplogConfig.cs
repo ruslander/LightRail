@@ -1,4 +1,4 @@
-namespace LightRail
+namespace StableStorage
 {
     public class OplogConfig
     {

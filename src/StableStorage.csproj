@@ -7,8 +7,8 @@
     <ProjectGuid>{853F48EA-2039-4816-BE6B-96A74744B9F3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LightRail</RootNamespace>
-    <AssemblyName>LightRail</AssemblyName>
+    <RootNamespace>StableStorage</RootNamespace>
+    <AssemblyName>StableStorage</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

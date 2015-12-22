@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace LightRail
+namespace StableStorage
 {
     public class HotSegmentBurner : IDisposable
     {

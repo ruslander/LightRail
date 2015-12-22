@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace LightRail
+namespace StableStorage
 {
     [Serializable]
     public class Op

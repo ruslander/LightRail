@@ -1,5 +1,5 @@
 using System;
-using LightRail;
+using StableStorage;
 using NUnit.Framework;
 
 namespace Specs

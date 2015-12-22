@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using LightRail;
+using StableStorage;
 using NUnit.Framework;
 
 namespace Specs
@@ -10,7 +10,7 @@ namespace Specs
     [TestFixture]
     public class OplogEndToEndSpec
     {
-        [Test,Ignore]
+        
         public void append_1_mln()
         {
             const int ops = 1000000;

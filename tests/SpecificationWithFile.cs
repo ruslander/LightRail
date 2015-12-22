@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using LightRail;
+using StableStorage;
 using NUnit.Framework;
 
 namespace Specs

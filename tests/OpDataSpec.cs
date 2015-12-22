@@ -1,6 +1,7 @@
+using System;
 using System.IO;
 using System.Security.Cryptography;
-using LightRail;
+using StableStorage;
 using NUnit.Framework;
 
 namespace Specs
@@ -60,6 +61,16 @@ namespace Specs
             o.WriteTo(writer);
 
             Assert.That(storage.ToArray().Length, Is.EqualTo(8+16+1));
+        }
+
+        [Test]
+        public void WriteFormat()
+        {
+            var o = new OpData(_oneByte, 1);
+
+            Assert.That(BitConverter.GetBytes(o.Position).Length, Is.EqualTo(8));
+            Assert.That(o.Hash.Length, Is.EqualTo(16));
+            Assert.That(o.Payload.Length, Is.EqualTo(1));
         }
 
         [Test]
